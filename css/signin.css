@@ -218,3 +218,11 @@
 .signup-link a:hover {
   color: #e0b96a;
 }
+
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 767px) {
+  .signin-wrap { padding: 80px 18px 40px; }
+  .signin-card { padding: 32px 22px; }
+}

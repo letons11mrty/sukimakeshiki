@@ -332,3 +332,29 @@
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.04);
 }
+
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 767px) {
+  /* バナー */
+  .welcome-banner { height: 200px; }
+  .welcome-text   { font-size: 22px; margin-left: 22px; }
+
+  /* 2カラム → 1カラム */
+  .home-body {
+    grid-template-columns: 1fr;
+  }
+
+  .left-col {
+    padding: 20px 18px;
+    border-right: none;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .right-col { padding: 20px 18px; }
+
+  /* Resources アイコン間隔を詰める */
+  .resources-row { gap: 20px; }
+  .res-icon { width: 50px; height: 50px; font-size: 22px; }
+}

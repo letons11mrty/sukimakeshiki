@@ -364,3 +364,29 @@
 .lock-group {
   pointer-events: none;
 }
+
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 767px) {
+  /* 2カラム → 1カラム */
+  .map-body {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+
+  .map-col {
+    padding: 18px 16px;
+    border-right: none;
+    border-bottom: 1px solid #2a2a2a;
+  }
+
+  .kanto-map { max-width: 100%; }
+
+  .info-col {
+    padding: 18px 16px;
+  }
+
+  /* チェックインボタンを常に見える位置に */
+  .pref-panel { gap: 12px; }
+}

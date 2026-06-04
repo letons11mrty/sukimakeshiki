@@ -722,3 +722,54 @@
 .drawer-menu a:hover { background: rgba(255,255,255,0.06); color: #fff; }
 .drawer-menu a.active { color: #2563eb; background: rgba(37,99,235,0.08); }
 .drawer-menu i { width: 18px; text-align: center; opacity: 0.55; }
+
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 1023px) {
+  /* タブレット：フィルターを隠す */
+  .main-layout {
+    grid-template-columns: 1fr 320px;
+  }
+  .filter-panel { display: none; }
+}
+
+@media (max-width: 767px) {
+  /* ── ヘッダー検索バー：セグメント2・3を非表示 ── */
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .filter-panel { display: none; }
+
+  /* 検索バーの2・3セグメントを隠す */
+  .search-segment:not(:first-child) { display: none; }
+  .seg-divider { display: none; }
+  .search-bar-wrap { border-radius: 8px; }
+
+  /* ソートバー */
+  .sort-tabs { overflow-x: auto; padding-bottom: 2px; }
+  .sort-tab  { white-space: nowrap; flex-shrink: 0; }
+
+  /* スポットカード：横並び→縦並び */
+  .spot-card {
+    grid-template-columns: 1fr;
+  }
+  .card-thumb {
+    height: 180px;
+  }
+
+  /* マップパネル：下部に固定高さで表示 */
+  .map-panel {
+    border-left: none;
+    border-top: 1px solid #242424;
+    order: -1; /* スポットリストの上に */
+  }
+  .map-sticky {
+    position: static;
+    height: 260px;
+  }
+  #leaflet-map { height: 100%; }
+  .map-selected { display: none; }
+}

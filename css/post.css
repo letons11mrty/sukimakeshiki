@@ -548,6 +548,40 @@
   flex-shrink: 0;
 }
 
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 1023px) {
+  .post-body {
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 767px) {
+  /* 2カラム → 1カラム */
+  .post-body {
+    grid-template-columns: 1fr;
+    padding: 16px 14px;
+    gap: 16px;
+  }
+
+  /* プレビューと Tips を下へ（フォームの後） */
+  .post-side-col { order: 1; }
+  .post-form-col { order: 0; }
+
+  /* プレビューカードは sticky を解除 */
+  .preview-card { position: static; }
+
+  /* 写真グリッドを3列に */
+  .photo-preview-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* ヘッダー */
+  .post-header-title { font-size: 14px; }
+  .btn-post-submit   { padding: 8px 16px; font-size: 12px; }
+}
+
 /* ── ドロワー（shared） ── */
 .drawer-overlay {
   position: fixed;

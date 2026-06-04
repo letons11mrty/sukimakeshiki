@@ -291,3 +291,45 @@
   color: rgba(255, 255, 255, 0.38);
   letter-spacing: 0.02em;
 }
+
+/* ==============================
+   レスポンシブ
+   ============================== */
+@media (max-width: 767px) {
+  .login-header {
+    padding: 16px 18px;
+    align-items: center;
+  }
+
+  /* 検索バーをモバイルで非表示 */
+  .search-area { display: none; }
+
+  .login-content {
+    padding: 100px 24px 160px;
+    max-width: 100%;
+  }
+
+  .hero-text {
+    font-size: 28px;
+    margin-bottom: 36px;
+    letter-spacing: 0.12em;
+  }
+
+  .auth-buttons {
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .stats-bar {
+    flex-wrap: wrap;
+  }
+
+  .stat-item {
+    flex: 1 1 33%;
+    padding: 14px 16px;
+    min-width: 0;
+  }
+
+  .stat-number { font-size: 20px; }
+  .stat-head   { font-size: 10px; }
+}
