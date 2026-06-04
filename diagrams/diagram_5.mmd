@@ -1,0 +1,50 @@
+erDiagram
+    USER ||--o{ ORDER : places
+    USER {
+        string user_id PK
+        string user_name
+        string email UK
+        string password_hash
+        datetime created_at
+        datetime updated_at
+    }
+    
+    ORDER ||--|{ ORDER_ITEM : contains
+    ORDER {
+        string order_id PK
+        string user_id FK
+        datetime order_date
+        string status
+        decimal total_amount
+        datetime created_at
+    }
+    
+    PRODUCT ||--o{ ORDER_ITEM : "ordered in"
+    PRODUCT {
+        string product_id PK
+        string product_name
+        text description
+        decimal price
+        integer stock
+        string category
+        datetime created_at
+    }
+    
+    ORDER_ITEM {
+        string order_item_id PK
+        string order_id FK
+        string product_id FK
+        integer quantity
+        decimal price
+    }
+    
+    USER ||--o{ REVIEW : writes
+    PRODUCT ||--o{ REVIEW : "reviewed in"
+    REVIEW {
+        string review_id PK
+        string user_id FK
+        string product_id FK
+        integer rating
+        text comment
+        datetime created_at
+    }

@@ -1,0 +1,366 @@
+/* ==============================
+   MAP PAGE
+   ============================== */
+
+#map-page {
+  min-height: 100vh;
+  background: #1a1a1a;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- レイアウト ---- */
+.map-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  min-height: calc(100vh - 50px);
+}
+
+/* ---- 左カラム（マップ） ---- */
+.map-col {
+  padding: 28px 32px;
+  border-right: 1px solid #2a2a2a;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.map-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.map-heading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+
+.map-sub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.04em;
+}
+
+/* ---- SVGラッパー ---- */
+.map-svg-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kanto-map {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.5));
+}
+
+/* ---- 都県パス（共通） ---- */
+.pref-path {
+  cursor: pointer;
+  stroke: #0e0e0e;
+  stroke-width: 2;
+  transition: filter 0.25s, opacity 0.25s;
+}
+
+/* ロック状態 */
+.pref-path.locked {
+  fill: #2a2a2a;
+  filter: none;
+}
+
+.pref-path.locked:hover {
+  fill: #333;
+}
+
+/* 解除済み */
+.pref-path.unlocked {
+  filter: drop-shadow(0 0 6px rgba(200,164,90,0.15));
+}
+
+.pref-path.unlocked:hover {
+  filter: drop-shadow(0 0 12px rgba(200,164,90,0.35)) brightness(1.15);
+}
+
+/* 選択中 */
+.pref-path.selected {
+  stroke: #c8a45a;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 14px rgba(200,164,90,0.5));
+}
+
+/* 解除アニメーション */
+@keyframes unlockFlash {
+  0%   { filter: grayscale(1) brightness(0.4); }
+  25%  { filter: grayscale(0) brightness(2.2); }
+  50%  { filter: grayscale(0) brightness(1.4); }
+  100% { filter: grayscale(0) brightness(1) drop-shadow(0 0 6px rgba(200,164,90,0.2)); }
+}
+
+.pref-path.unlocking {
+  animation: unlockFlash 1.2s ease forwards;
+}
+
+/* ロックアイコン（SVG内テキスト） */
+.lock-icon {
+  font-size: 18px;
+  fill: rgba(255,255,255,0.25);
+  pointer-events: none;
+  user-select: none;
+}
+
+.pref-label {
+  font-size: 13px;
+  font-weight: 600;
+  fill: rgba(255,255,255,0.7);
+  pointer-events: none;
+  user-select: none;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.pref-label.locked-label {
+  fill: rgba(255,255,255,0.22);
+}
+
+/* ---- 凡例 ---- */
+.map-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+}
+
+.legend-dot.unlocked { background: #c8a45a; }
+.legend-dot.locked   { background: #2a2a2a; border: 1px solid #444; }
+
+/* ---- 右カラム（情報パネル） ---- */
+.info-col {
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ---- 解除進捗 ---- */
+.unlock-progress {
+  background: #1c1c1c;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+  letter-spacing: 0.04em;
+}
+
+.progress-bar-wrap {
+  background: rgba(255,255,255,0.06);
+  border-radius: 50px;
+  height: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #c8a45a, #e0b96a);
+  border-radius: 50px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+.progress-text {
+  font-size: 13px;
+  color: #c8a45a;
+  font-weight: 600;
+}
+
+/* ---- 都県パネル ---- */
+.pref-panel {
+  flex: 1;
+  background: #1c1c1c;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pref-select-hint {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.2);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+/* 都県名ヘッダー */
+.pref-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pref-name {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.06em;
+}
+
+.pref-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 50px;
+  font-weight: 600;
+}
+
+.pref-status.unlocked {
+  background: rgba(200,164,90,0.15);
+  color: #c8a45a;
+  border: 1px solid rgba(200,164,90,0.3);
+}
+
+.pref-status.locked {
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* 統計グリッド */
+.pref-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.stat-cell {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 12px;
+  transition: filter 0.3s;
+}
+
+.stat-cell.blurred {
+  filter: blur(5px);
+  user-select: none;
+}
+
+.stat-cell-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 6px;
+}
+
+.stat-cell-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* チェックインボタン */
+.btn-checkin {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 50px;
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-checkin.available {
+  background: linear-gradient(135deg, #c8a45a, #e0b96a);
+  color: #0a0e16;
+}
+
+.btn-checkin.available:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200,164,90,0.35);
+}
+
+.btn-checkin.available:active {
+  transform: translateY(0);
+}
+
+.btn-checkin.done {
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.3);
+  cursor: default;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* チェックイン日時 */
+.checkin-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* ---- トースト通知 ---- */
+.unlock-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, rgba(200,164,90,0.95), rgba(224,185,106,0.95));
+  color: #0a0e16;
+  padding: 14px 28px;
+  border-radius: 50px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s, transform 0.35s;
+  z-index: 999;
+  box-shadow: 0 8px 32px rgba(200,164,90,0.4);
+}
+
+.unlock-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---- ロックオーバーレイ（未解除エリアのSVG内テキスト） ---- */
+.lock-group {
+  pointer-events: none;
+}

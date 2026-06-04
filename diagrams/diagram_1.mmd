@@ -1,0 +1,30 @@
+graph TB
+    subgraph "クライアント層"
+        A[Webブラウザ]
+        B[モバイルアプリ]
+    end
+    
+    subgraph "アプリケーション層"
+        C[Webサーバー]
+        D[APIサーバー]
+        E[業務ロジック]
+    end
+    
+    subgraph "データ層"
+        F[(データベース)]
+        G[(ファイルストレージ)]
+    end
+    
+    subgraph "外部連携"
+        H[外部API]
+        I[認証サービス]
+    end
+    
+    A --> C
+    B --> D
+    C --> E
+    D --> E
+    E --> F
+    E --> G
+    E --> H
+    E --> I

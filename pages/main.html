@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スポット検索 | バイクコミュニティ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/main.css">
+  <style>
+    .lock-marker {
+      font-size: 20px;
+      line-height: 36px;
+      text-align: center;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+      pointer-events: none;
+    }
+    .locked-overlay {
+      pointer-events: none;
+    }
+
+    /* ── マップ全画面拡大 ── */
+    .map-panel.expanded {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      width: 100% !important;
+      height: 100dvh;
+      background: #111;
+    }
+    .map-panel.expanded .map-sticky {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    .map-panel.expanded .map-frame {
+      flex: 1;
+      min-height: 0;
+    }
+    .map-panel.expanded #leaflet-map {
+      height: 100% !important;
+    }
+    .map-panel.expanded .map-selected {
+      display: none;
+    }
+    .map-expand-btn {
+      cursor: pointer;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.7);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 13px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .map-expand-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">
+    <img src="../images/iron.png" alt="ロゴ">
+    <span>バイクコミュニティ</span>
+  </div>
+  <div class="drawer-menu">
+    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
+    <a href="main.html" class="active"><i class="fa fa-map"></i> マップ</a>
+    <a href="post.html"><i class="fa fa-plus-circle"></i> 投稿する</a>
+    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
+    <a href="#"><i class="fa fa-motorcycle"></i> ガレージ</a>
+    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+  </div>
+</nav>
+
+<!-- ===== MAIN PAGE ===== -->
+<div id="main-page" class="page active">
+
+  <!-- HEADER -->
+  <header class="main-header">
+    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <div class="header-divider"></div>
+
+    <!-- 検索バー -->
+    <div class="search-bar-wrap">
+      <div class="search-segment">
+        <i class="fa fa-map-marker-alt seg-icon"></i>
+        <div class="seg-body">
+          <div class="seg-label">エリア</div>
+          <input class="seg-input" type="text" value="北海道・東北" placeholder="エリア">
+        </div>
+      </div>
+      <div class="seg-divider"></div>
+      <div class="search-segment">
+        <i class="fa fa-calendar seg-icon"></i>
+        <div class="seg-body">
+          <div class="seg-label">ツーリング予定日</div>
+          <input class="seg-input" type="text" value="2025年5月20日">
+        </div>
+      </div>
+      <div class="seg-divider"></div>
+      <div class="search-segment">
+        <i class="fa fa-road seg-icon"></i>
+        <div class="seg-body">
+          <div class="seg-label">ジャンル</div>
+          <input class="seg-input" type="text" value="すべて">
+        </div>
+      </div>
+      <button class="search-exec-btn"><i class="fa fa-search"></i></button>
+    </div>
+  </header>
+
+  <!-- SORT BAR -->
+  <div class="sort-bar">
+    <div class="result-count"><span class="count-num">248</span> 件のスポット</div>
+    <div class="sort-tabs">
+      <button class="sort-tab active">おすすめ順</button>
+      <button class="sort-tab">評価が高い順</button>
+      <button class="sort-tab">距離が近い順</button>
+      <button class="sort-tab">お気に入り数順</button>
+    </div>
+    <div class="view-toggles">
+      <button class="view-btn active" title="リスト表示"><i class="fa fa-list"></i></button>
+      <button class="view-btn" title="グリッド表示"><i class="fa fa-th"></i></button>
+    </div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+
+    <!-- ===== LEFT: FILTER PANEL ===== -->
+    <aside class="filter-panel">
+
+      <div class="filter-block">
+        <div class="filter-block-title">絞り込み条件</div>
+
+        <!-- フリーワード -->
+        <div class="filter-group">
+          <div class="filter-group-label">フリーワード</div>
+          <div class="filter-search-wrap">
+            <i class="fa fa-search filter-search-icon"></i>
+            <input class="filter-search-input" type="text" placeholder="スポット名・キーワード">
+          </div>
+        </div>
+
+        <!-- 地形 -->
+        <div class="filter-group">
+          <div class="filter-group-label">地形タイプ</div>
+          <label class="filter-check"><input type="checkbox" checked> <span>山岳・峠道</span></label>
+          <label class="filter-check"><input type="checkbox" checked> <span>海岸線・絶景</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>高原・草原</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>森林・湖</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>街中・グルメ</span></label>
+        </div>
+
+        <!-- 評価 -->
+        <div class="filter-group">
+          <div class="filter-group-label">評価</div>
+          <label class="filter-check"><input type="radio" name="rating" checked> <span class="stars">★★★★★</span><span class="rating-label"> 4.5以上</span></label>
+          <label class="filter-check"><input type="radio" name="rating"> <span class="stars">★★★★</span><span class="rating-label"> 4.0以上</span></label>
+          <label class="filter-check"><input type="radio" name="rating"> <span class="stars">★★★</span><span class="rating-label"> 3.0以上</span></label>
+          <label class="filter-check"><input type="radio" name="rating"> <span>指定なし</span></label>
+        </div>
+
+        <!-- 難易度 -->
+        <div class="filter-group">
+          <div class="filter-group-label">難易度</div>
+          <label class="filter-check"><input type="checkbox" checked> <span>初心者向け</span></label>
+          <label class="filter-check"><input type="checkbox" checked> <span>中級者向け</span></label>
+          <label class="filter-check"><input type="checkbox"> <span>上級者向け</span></label>
+        </div>
+
+        <!-- 距離 -->
+        <div class="filter-group">
+          <div class="filter-group-label">現在地からの距離</div>
+          <div class="slider-wrap">
+            <input class="range-slider" type="range" min="0" max="500" value="200" id="distSlider">
+            <div class="slider-value"><span id="distVal">200</span> km以内</div>
+          </div>
+        </div>
+
+        <!-- 設備 -->
+        <div class="filter-group">
+          <div class="filter-group-label">周辺設備</div>
+          <label class="filter-check"><input type="checkbox"> <span><i class="fa fa-gas-pump"></i> ガソリンスタンド</span></label>
+          <label class="filter-check"><input type="checkbox"> <span><i class="fa fa-utensils"></i> 飲食店</span></label>
+          <label class="filter-check"><input type="checkbox"> <span><i class="fa fa-parking"></i> 駐車場</span></label>
+          <label class="filter-check"><input type="checkbox"> <span><i class="fa fa-restroom"></i> トイレ</span></label>
+        </div>
+
+      </div>
+
+      <button class="filter-reset-btn"><i class="fa fa-undo"></i> 条件をリセット</button>
+    </aside>
+
+    <!-- ===== CENTER: SPOT LIST ===== -->
+    <section class="spot-list">
+
+      <!-- ── カード 1 ── -->
+      <div class="spot-card" data-prefecture="gunma">
+        <div class="card-thumb">
+          <img src="../images/home-image.png" alt="スポット写真">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">峠道</span>
+            <span class="tag tag-level">中級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">碓氷峠 めがね橋ルート</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 群馬県 安中市</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.8</div>
+              <div class="card-rating-label">最高</div>
+              <div class="card-review-count">1,234件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            群馬を代表する絶景ルート。めがね橋から見下ろすロマンチック街道は絶景。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 42 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 1.5 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 8,430</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── カード 2 ── -->
+      <div class="spot-card" data-prefecture="chiba">
+        <div class="card-thumb">
+          <img src="../images/home-image.png" alt="スポット写真">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn active"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">海岸線</span>
+            <span class="tag tag-level tag-beginner">初級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">九十九里浜 サンセットライン</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 千葉県 山武郡</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.6</div>
+              <div class="card-rating-label">優秀</div>
+              <div class="card-review-count">987件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            太平洋を横目に走り抜けるフラットな海沿いルート。初心者でも快適に走れる絶景コース。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 60 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 2.0 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 6,201</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-restroom access-icon ng"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── カード 3 ── -->
+      <div class="spot-card" data-prefecture="tokyo">
+        <div class="card-thumb">
+          <img src="../images/home-image.png" alt="スポット写真">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">街中・夜景</span>
+            <span class="tag tag-level">初級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">お台場 レインボーブリッジ夜景ルート</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 江東区</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.7</div>
+              <div class="card-rating-label">優秀</div>
+              <div class="card-review-count">3,241件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            夜のお台場を走り抜ける都会の絶景ルート。レインボーブリッジのライトアップが圧巻。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 18 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.8 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 11,430</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── カード 4 ── -->
+      <div class="spot-card" data-prefecture="tochigi">
+        <div class="card-thumb">
+          <img src="../images/home-image.png" alt="スポット写真">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">森林・湖</span>
+            <span class="tag tag-level">中級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">奥日光 中禅寺湖スカイライン</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 栃木県 日光市</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.7</div>
+              <div class="card-rating-label">優秀</div>
+              <div class="card-review-count">1,562件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            紅葉の名所・中禅寺湖を見下ろすワインディングロード。四季折々の表情が楽しめる。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 55 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 2.5 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 9,770</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ページネーション -->
+      <div class="pagination">
+        <button class="page-btn disabled"><i class="fa fa-chevron-left"></i></button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <span class="page-ellipsis">...</span>
+        <button class="page-btn">31</button>
+        <button class="page-btn"><i class="fa fa-chevron-right"></i></button>
+      </div>
+    </section>
+
+    <!-- ===== RIGHT: MAP ===== -->
+    <div class="map-panel">
+      <div class="map-sticky">
+        <div class="map-header">
+          <span class="map-title"><i class="fa fa-map"></i> エリアマップ</span>
+          <button class="map-expand-btn" onclick="toggleMapExpand()"><i class="fa fa-expand-alt"></i></button>
+        </div>
+        <div class="map-frame">
+          <div id="leaflet-map"></div>
+        </div>
+
+        <!-- マップ下: 選択中スポット -->
+        <div class="map-selected">
+          <div class="map-selected-label">選択中のスポット</div>
+          <div class="map-selected-card">
+            <img src="../images/home-image.png" alt="">
+            <div class="map-selected-info">
+              <div class="map-sel-name">乗鞍スカイライン 全線制覇</div>
+              <div class="map-sel-loc"><i class="fa fa-map-marker-alt"></i> 長野県 松本市</div>
+              <div class="map-sel-rating"><span class="map-sel-score">4.9</span> <span class="map-sel-stars">★★★★★</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  /* ── マップ拡大／縮小 ── */
+  let leafletMap = null; // Leaflet インスタンスを外から参照できるよう保持
+
+  function toggleMapExpand() {
+    const panel = document.querySelector('.map-panel');
+    const btn   = document.querySelector('.map-expand-btn i');
+    const expanded = panel.classList.toggle('expanded');
+
+    btn.className = expanded ? 'fa fa-compress-alt' : 'fa fa-expand-alt';
+
+    // Leaflet にサイズ変更を通知（少し遅らせてDOMが確定してから）
+    if (leafletMap) {
+      setTimeout(() => leafletMap.invalidateSize(), 50);
+    }
+
+    // ESC キーで閉じられるように
+    if (expanded) {
+      document.addEventListener('keydown', closeOnEsc);
+    } else {
+      document.removeEventListener('keydown', closeOnEsc);
+    }
+  }
+
+  function closeOnEsc(e) {
+    if (e.key === 'Escape') toggleMapExpand();
+  }
+
+  /* ── Drawer ── */
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  /* ── Distance slider ── */
+  const slider = document.getElementById('distSlider');
+  const distVal = document.getElementById('distVal');
+  if (slider) slider.addEventListener('input', () => { distVal.textContent = slider.value; });
+
+  /* ── Sort tabs ── */
+  document.querySelectorAll('.sort-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sort-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  /* ── View toggles ── */
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  /* ── Fav buttons ── */
+  document.querySelectorAll('.fav-btn').forEach(btn => {
+    btn.addEventListener('click', () => btn.classList.toggle('active'));
+  });
+
+  /* ── エリア解除フィルター ── */
+  function getUnlocked() {
+    try { return JSON.parse(localStorage.getItem('sk_unlocked')) || ['tokyo']; }
+    catch { return ['tokyo']; }
+  }
+
+  function applyAreaFilter() {
+    const unlocked = getUnlocked();
+    const cards = document.querySelectorAll('.spot-card[data-prefecture]');
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const pref = card.dataset.prefecture;
+      if (unlocked.includes(pref)) {
+        card.style.display = '';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    // 件数更新
+    const countEl = document.querySelector('.count-num');
+    if (countEl) countEl.textContent = visibleCount;
+
+    // 全件ロック時の空状態表示
+    const list = document.querySelector('.spot-list');
+    let emptyEl = document.getElementById('emptyState');
+    if (visibleCount === 0) {
+      if (!emptyEl) {
+        emptyEl = document.createElement('div');
+        emptyEl.id = 'emptyState';
+        emptyEl.innerHTML = `
+          <div style="text-align:center;padding:60px 24px;color:rgba(255,255,255,0.35);">
+            <div style="font-size:40px;margin-bottom:16px;">🔒</div>
+            <div style="font-size:16px;font-weight:600;margin-bottom:10px;">スポットがありません</div>
+            <div style="font-size:13px;line-height:1.7;">
+              解除済みエリアのスポットのみ表示されます。<br>
+              <a href="map.html" style="color:#c8a45a;text-decoration:underline;">エリアを解除する →</a>
+            </div>
+          </div>`;
+        list.prepend(emptyEl);
+      }
+    } else {
+      if (emptyEl) emptyEl.remove();
+    }
+  }
+
+  /* ── Card animation & ユーザー投稿読み込み ── */
+  window.addEventListener('load', () => {
+    loadUserPosts();   // localStorage から投稿カードを生成
+    applyAreaFilter(); // エリアフィルターを適用（カード数も更新）
+    document.querySelectorAll('.spot-card').forEach((card, i) => {
+      if (card.style.display !== 'none') {
+        setTimeout(() => card.classList.add('visible'), i * 100);
+      }
+    });
+  });
+
+  /* 都県名 → 内部ID のマッピング */
+  const PREF_NAME_MAP = {
+    '群馬県': 'gunma',
+    '栃木県': 'tochigi',
+    '茨城県': 'ibaraki',
+    '埼玉県': 'saitama',
+    '千葉県': 'chiba',
+    '東京都': 'tokyo',
+    '神奈川県': 'kanagawa',
+  };
+
+  /* 都県の中心（ロックアイコン表示位置） */
+  const PREF_CENTERS = {
+    gunma:    [36.57, 138.85],
+    tochigi:  [36.57, 139.80],
+    ibaraki:  [36.28, 140.55],
+    saitama:  [36.00, 139.40],
+    tokyo:    [35.67, 139.45],
+    chiba:    [35.40, 140.35],
+    kanagawa: [35.30, 139.38],
+  };
+
+  /* ── Leaflet Map ── */
+  const SPOTS = [
+    { name: '碓氷峠 めがね橋ルート',         lat: 36.3395, lng: 138.6640, rating: 4.8, highlight: false, pref: 'gunma'    },
+    { name: '九十九里浜 サンセットライン',     lat: 35.5600, lng: 140.4300, rating: 4.6, highlight: false, pref: 'chiba'    },
+    { name: 'お台場 レインボーブリッジ夜景',   lat: 35.6268, lng: 139.7739, rating: 4.7, highlight: true,  pref: 'tokyo'    },
+    { name: '奥日光 中禅寺湖スカイライン',     lat: 36.7330, lng: 139.4890, rating: 4.7, highlight: false, pref: 'tochigi'  },
+  ];
+
+  function makeIcon(highlight) {
+    const color  = highlight ? '#f59e0b' : '#2563eb';
+    const border = highlight ? '#fff'    : '#fff';
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+        <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 14 22 14 22S28 23.63 28 14C28 6.27 21.73 0 14 0z"
+              fill="${color}" stroke="${border}" stroke-width="1.5"/>
+        <circle cx="14" cy="14" r="5" fill="#fff"/>
+      </svg>`;
+    return L.divIcon({
+      html: svg,
+      iconSize:   [28, 36],
+      iconAnchor: [14, 36],
+      popupAnchor:[0, -38],
+      className:  ''
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const KANTO_BOUNDS = L.latLngBounds(
+      [34.7, 138.0],  // 南西端
+      [37.2, 141.2]   // 北東端
+    );
+
+    leafletMap = L.map('leaflet-map', {
+      center:              [36.0, 139.6],
+      zoom:                9,
+      minZoom:             8,
+      maxZoom:             14,
+      maxBounds:           KANTO_BOUNDS,
+      maxBoundsViscosity:  1.0,   // 範囲外にスクロール不可
+      zoomControl:         true,
+    });
+
+    /* ラベル専用ペイン（z-index 350 = オーバーレイ 400 の下） */
+    leafletMap.createPane('labelsPane');
+    leafletMap.getPane('labelsPane').style.zIndex = 350;
+    leafletMap.getPane('labelsPane').style.pointerEvents = 'none';
+
+    /* ① ベースタイル（道路・地形のみ、ラベルなし） */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      maxZoom: 19,
+      subdomains: 'abcd',
+    }).addTo(leafletMap);
+
+    /* ② ラベルタイル（地名・道路番号のみ）— オーバーレイの下に配置 */
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+      attribution: '',
+      maxZoom: 19,
+      subdomains: 'abcd',
+      pane: 'labelsPane',
+    }).addTo(leafletMap);
+
+    const unlocked = getUnlocked();
+
+    /* ロックアイコンを先に配置（GeoJSONと独立） */
+    Object.entries(PREF_CENTERS).forEach(([id, center]) => {
+      if (unlocked.includes(id)) return;
+      L.marker(center, {
+        icon: L.divIcon({
+          html: `<div class="lock-marker">🔒</div>`,
+          iconSize: [36, 36], iconAnchor: [18, 18], className: '',
+        }),
+        interactive: false,
+        zIndexOffset: 100,
+      }).addTo(leafletMap);
+    });
+
+    /* GeoJSON を fetch して
+       ① 世界マスク（穴 = 関東都県の実形状）
+       ② ロック中都県のオーバーレイ
+       を同時に生成                              */
+    fetch('https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson')
+      .then(r => r.json())
+      .then(data => {
+        const kantoFeatures = data.features.filter(f =>
+          f.properties && PREF_NAME_MAP[f.properties.nam_ja] !== undefined
+        );
+
+        /* ① 世界マスク：関東都県形状を穴として開ける */
+        const worldRing = [[-90,-180],[-90,180],[90,180],[90,-180]];
+        const holes = [];
+        kantoFeatures.forEach(feature => {
+          const geom = feature.geometry;
+          // Polygon / MultiPolygon 両対応
+          const polys = geom.type === 'MultiPolygon'
+            ? geom.coordinates
+            : [geom.coordinates];
+          polys.forEach(poly => {
+            // GeoJSON は [lng, lat] → Leaflet は [lat, lng] に変換
+            const ring = poly[0].map(([lng, lat]) => [lat, lng]);
+            holes.push(ring);
+          });
+        });
+        L.polygon([worldRing, ...holes], {
+          color:       'none',
+          fillColor:   '#0a0e16',
+          fillOpacity: 0.97,
+          interactive: false,
+        }).addTo(leafletMap);
+
+        /* ② ロック中都県のオーバーレイ */
+        L.geoJSON(
+          { type: 'FeatureCollection', features: kantoFeatures },
+          {
+            style: feature => {
+              const id = PREF_NAME_MAP[feature.properties.nam_ja];
+              const locked = !unlocked.includes(id);
+              return {
+                fillColor:   locked ? '#0a0e16' : 'transparent',
+                fillOpacity: locked ? 0.97 : 0,
+                color:       locked ? 'rgba(255,255,255,0.18)' : 'none',
+                weight:      locked ? 1 : 0,
+              };
+            },
+            interactive: false,
+          }
+        ).addTo(leafletMap);
+      })
+      .catch(() => {
+        // フォールバック：近似ポリゴン（ネット接続なし時）
+        console.warn('GeoJSON取得失敗 — 近似ポリゴンで代替');
+        const worldRing = [[-90,-180],[-90,180],[90,180],[90,-180]];
+        const kantoHole = [
+          [37.00,138.40],[37.00,140.25],[36.85,140.92],
+          [34.90,140.92],[34.90,139.82],[35.12,138.87],
+          [35.85,138.55],[36.20,138.40],
+        ];
+        L.polygon([worldRing, kantoHole], {
+          color:'none', fillColor:'#0a0e16', fillOpacity:0.85, interactive:false,
+        }).addTo(leafletMap);
+      });
+
+    /* 解除済みエリアの組み込みスポットマーカーを追加 */
+    SPOTS.forEach(sp => {
+      if (!unlocked.includes(sp.pref)) return;
+      const marker = L.marker([sp.lat, sp.lng], { icon: makeIcon(sp.highlight) }).addTo(leafletMap);
+      marker.bindPopup(`
+        <div class="map-popup">
+          <div class="mp-name">${sp.name}</div>
+          <div class="mp-rating">★ ${sp.rating}</div>
+        </div>
+      `, { className: 'dark-popup' });
+    });
+
+    /* ユーザー投稿スポットのマーカーを追加 */
+    addUserMarkers(unlocked);
+  });
+
+  /* ============================
+     ユーザー投稿 — localStorage 連携
+     ============================ */
+  const PREF_LABELS_JP = {
+    tokyo: '東京都', kanagawa: '神奈川県', saitama: '埼玉県',
+    chiba: '千葉県', ibaraki: '茨城県', tochigi: '栃木県', gunma: '群馬県',
+  };
+  const DIFF_LABELS_JP = ['', '初級', '初中級', '中級', '上級', 'エキスパート'];
+
+  function getUserPosts() {
+    try { return JSON.parse(localStorage.getItem('sk_posts') || '[]'); }
+    catch { return []; }
+  }
+
+  /* ゴールドのマップピン（ユーザー投稿用） */
+  function makeUserIcon() {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="36" viewBox="0 0 28 36">
+        <path d="M14 0C6.27 0 0 6.27 0 14c0 9.63 14 22 14 22S28 23.63 28 14C28 6.27 21.73 0 14 0z"
+              fill="#c8a45a" stroke="#fff" stroke-width="1.5"/>
+        <circle cx="14" cy="14" r="5" fill="#fff"/>
+      </svg>`;
+    return L.divIcon({ html: svg, iconSize: [28,36], iconAnchor: [14,36], popupAnchor: [0,-38], className: '' });
+  }
+
+  /* マップピンを追加（マップ初期化後に呼ぶ） */
+  function addUserMarkers(unlocked) {
+    if (!leafletMap) return;
+    getUserPosts().forEach(post => {
+      if (!unlocked.includes(post.pref)) return;
+      const marker = L.marker([post.lat, post.lng], { icon: makeUserIcon() }).addTo(leafletMap);
+      marker.bindPopup(`
+        <div class="map-popup">
+          <div class="mp-name">${post.name}</div>
+          <div class="mp-rating" style="color:#c8a45a;">★ 自分の投稿</div>
+        </div>
+      `, { className: 'dark-popup' });
+    });
+  }
+
+  /* スポットカードを生成して .spot-list に挿入 */
+  function loadUserPosts() {
+    const posts    = getUserPosts();
+    const spotList = document.querySelector('.spot-list');
+    const pagination = document.querySelector('.pagination');
+
+    // 既存のユーザー投稿カードを一旦削除（リロード等の重複防止）
+    document.querySelectorAll('.spot-card.user-post').forEach(c => c.remove());
+
+    posts.forEach(post => {
+      const card = document.createElement('div');
+      card.className = 'spot-card user-post';
+      card.dataset.prefecture = post.pref;
+
+      const scoreText = post.score > 0 ? post.score + '.0' : '—';
+      const diffText  = DIFF_LABELS_JP[post.difficulty] || '';
+      const thumbHTML = post.photo
+        ? `<img src="${post.photo}" alt="${post.name}">`
+        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1c1c1c;">
+             <i class="fa fa-image" style="font-size:32px;color:rgba(255,255,255,0.1);"></i>
+           </div>`;
+
+      card.innerHTML = `
+        <div class="card-thumb">
+          ${thumbHTML}
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag" style="background:rgba(200,164,90,0.2);color:#c8a45a;border:1px solid rgba(200,164,90,0.35);">
+              <i class="fa fa-user" style="font-size:9px;"></i> 自分の投稿
+            </span>
+            ${post.genre    ? `<span class="tag tag-terrain">${post.genre}</span>` : ''}
+            ${diffText      ? `<span class="tag tag-level">${diffText}</span>`      : ''}
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">${post.name}</div>
+              <div class="card-location">
+                <i class="fa fa-map-marker-alt"></i> ${PREF_LABELS_JP[post.pref] || post.pref}
+              </div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating" style="${post.score > 0 ? 'color:#c8a45a;' : 'color:rgba(255,255,255,0.3);'}">${scoreText}</div>
+              <div class="card-review-count">${post.postedAt || ''}</div>
+            </div>
+          </div>
+          ${post.desc ? `<div class="card-desc">${post.desc}</div>` : ''}
+          ${post.tags && post.tags.length
+            ? `<div class="card-meta" style="flex-wrap:wrap;gap:5px;">
+                 ${post.tags.slice(0,4).map(t =>
+                   `<span style="font-size:11px;color:#c8a45a;background:rgba(200,164,90,0.1);padding:2px 8px;border-radius:50px;">#${t}</span>`
+                 ).join('')}
+               </div>`
+            : ''}
+          <div class="card-footer">
+            <div class="card-access" style="font-size:12px;color:rgba(255,255,255,0.3);">
+              <i class="fa fa-map-marker-alt" style="margin-right:4px;color:#c8a45a;"></i>
+              ${post.address ? post.address.split(',')[0] : '位置情報あり'}
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>`;
+
+      // お気に入りボタン
+      card.querySelector('.fav-btn').addEventListener('click', function() {
+        this.classList.toggle('active');
+      });
+
+      // ページネーションの直前に挿入（なければ末尾）
+      if (pagination) {
+        spotList.insertBefore(card, pagination);
+      } else {
+        spotList.appendChild(card);
+      }
+    });
+  }
+</script>
+</body>
+</html>

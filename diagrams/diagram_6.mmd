@@ -1,0 +1,45 @@
+classDiagram
+    class User {
+        +String userId
+        +String userName
+        +String email
+        +String password
+        +Date createdAt
+        +login()
+        +logout()
+        +updateProfile()
+    }
+    
+    class Order {
+        +String orderId
+        +String userId
+        +Date orderDate
+        +String status
+        +Decimal totalAmount
+        +createOrder()
+        +cancelOrder()
+        +getOrderDetails()
+    }
+    
+    class Product {
+        +String productId
+        +String productName
+        +String description
+        +Decimal price
+        +Integer stock
+        +updateStock()
+        +getProductInfo()
+    }
+    
+    class OrderItem {
+        +String orderItemId
+        +String orderId
+        +String productId
+        +Integer quantity
+        +Decimal price
+        +calculateSubtotal()
+    }
+    
+    User "1" --> "0..*" Order : places
+    Order "1" --> "1..*" OrderItem : contains
+    Product "1" --> "0..*" OrderItem : referenced by

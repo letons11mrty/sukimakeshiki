@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン | バイクコミュニティ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+<div id="login-page" class="page active">
+  <div class="login-bg"></div>
+  <div class="login-overlay"></div>
+
+  <header class="login-header">
+    <a class="logo" href="index.html">
+      <img class="logo-img" src="images/icon.png" alt="ロゴ">
+    </a>
+    <div class="search-area">
+      <div class="search-bar">
+        <i class="fa fa-map-marker-alt"></i>
+        <span>スポットを探す</span>
+      </div>
+      <button class="search-btn"><i class="fa fa-search"></i></button>
+    </div>
+  </header>
+
+  <div class="login-content">
+    <h1 class="hero-text">バイクでつながる<br>最高の景色へ</h1>
+
+    <div class="auth-buttons">
+      <button class="btn-auth btn-apple" onclick="goHome()">
+        <i class="fab fa-apple"></i> Appleで実行
+      </button>
+      <button class="btn-auth btn-google" onclick="goHome()">
+        <svg width="17" height="17" viewBox="0 0 18 18" style="flex-shrink:0">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.962L3.964 6.294C4.672 4.169 6.656 3.58 9 3.58z"/>
+        </svg>
+        Googleで実行
+      </button>
+      <button class="btn-auth btn-email" onclick="goHome()">
+        メールアドレスで新規登録
+      </button>
+      <button class="btn-link" onclick="window.location.href='pages/signin.html'">既にアカウントをお持ちの場合</button>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-head"><i class="fa fa-map-marker-alt"></i><span>スポット数</span></div>
+      <div class="stat-number" data-target="2434">0</div>
+      <div class="stat-sub">全国の絶景スポット</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-head"><i class="fa fa-images"></i><span>投稿数</span></div>
+      <div class="stat-number" data-target="16384">0</div>
+      <div class="stat-sub">旅の思い出</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-head"><i class="fa fa-user"></i><span>ライダー数</span></div>
+      <div class="stat-number" data-target="8192">0</div>
+      <div class="stat-sub">仲間とつながろう</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.btn-auth').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+      this.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+  });
+
+  function countUp(el, target, duration) {
+    const fmt = { 2434:'2,434+', 16384:'16,384+', 8192:'8,192+' };
+    let start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target).toLocaleString() + '+';
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = fmt[target] || target.toLocaleString() + '+';
+    }
+    requestAnimationFrame(step);
+  }
+
+  function goHome() {
+    document.getElementById('login-page').style.transition = 'opacity 0.4s ease';
+    document.getElementById('login-page').style.opacity = '0';
+    setTimeout(() => { window.location.href = 'pages/home.html'; }, 400);
+  }
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.querySelectorAll('.stat-number[data-target]').forEach(el => {
+        countUp(el, parseInt(el.dataset.target), 1800);
+      });
+    }, 1000);
+  });
+</script>
+</body>
+</html>

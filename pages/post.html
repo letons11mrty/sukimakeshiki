@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>景色を投稿 | すきまけしき</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/post.css">
+</head>
+<body>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">
+    <img src="../images/iron.png" alt="ロゴ">
+    <span>バイクコミュニティ</span>
+  </div>
+  <div class="drawer-menu">
+    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
+    <a href="main.html"><i class="fa fa-map"></i> マップ</a>
+    <a href="post.html" class="active"><i class="fa fa-plus-circle"></i> 投稿する</a>
+    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
+    <a href="#"><i class="fa fa-motorcycle"></i> ガレージ</a>
+    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+  </div>
+</nav>
+
+<!-- ===== POST PAGE ===== -->
+<div id="post-page" class="page active">
+
+  <!-- HEADER -->
+  <header class="post-header">
+    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <div class="header-divider" style="width:1px;height:20px;background:rgba(255,255,255,0.15);"></div>
+    <span class="post-header-title">景色を投稿する</span>
+    <button class="btn-post-submit" onclick="submitPost()">
+      <i class="fa fa-paper-plane" style="margin-right:6px;"></i>投稿する
+    </button>
+  </header>
+
+  <!-- BODY -->
+  <div class="post-body">
+
+    <!-- ── 左カラム：フォーム ── -->
+    <div class="post-form-col">
+
+      <!-- 写真 -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-camera"></i> 写真を追加
+        </div>
+        <div class="photo-upload-area" id="uploadArea"
+             onclick="document.getElementById('photoInput').click()"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          <div class="upload-icon"><i class="fa fa-image"></i></div>
+          <div class="upload-text">
+            <span>クリックして写真を選択</span><br>またはここにドラッグ＆ドロップ
+          </div>
+          <div class="upload-limit">PNG・JPG・HEIC 対応 ／ 最大 10 枚</div>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" multiple style="display:none"
+               onchange="handleFiles(this.files)">
+        <div class="photo-preview-grid" id="photoGrid"></div>
+      </div>
+
+      <!-- 基本情報 -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-info-circle"></i> 基本情報
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">スポット名 <span class="required">必須</span></label>
+          <input class="form-input" type="text" id="spotName"
+                 placeholder="例：榛名湖展望台"
+                 maxlength="50"
+                 oninput="updatePreview(); countChars(this, 'nameCount', 50)">
+          <div class="char-count" id="nameCount">0 / 50</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">エリア（都県）<span class="required">必須</span></label>
+          <select class="form-select" id="prefSelect" onchange="updatePreview()">
+            <option value="">都県を選択してください</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">ジャンル</label>
+          <select class="form-select" id="genreSelect" onchange="updatePreview()">
+            <option value="">ジャンルを選択</option>
+            <option>山岳・峠</option>
+            <option>湖・ダム</option>
+            <option>海岸・岬</option>
+            <option>田園・里山</option>
+            <option>夜景・都市</option>
+            <option>滝・渓谷</option>
+            <option>名所・史跡</option>
+            <option>その他</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">おすすめ時間帯</label>
+          <select class="form-select" id="timeSelect">
+            <option value="">指定なし</option>
+            <option>早朝（日の出前後）</option>
+            <option>午前中</option>
+            <option>昼間</option>
+            <option>夕暮れ〜サンセット</option>
+            <option>夜景・ナイトツーリング</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 位置情報 -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-map-marker-alt"></i> 位置情報
+        </div>
+
+        <div class="form-label" style="margin-bottom:10px;">
+          スポットの場所 <span class="required">必須</span>
+        </div>
+
+        <!-- 場所検索バー -->
+        <div class="loc-search-row">
+          <div class="loc-search-wrap" id="locSearchWrap">
+            <i class="fa fa-search loc-search-icon"></i>
+            <input class="loc-search-input" id="locSearchInput" type="text"
+                   placeholder="場所名・住所で検索（例：榛名湖、渋谷区…）"
+                   oninput="onLocSearchInput()"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();doLocSearch();}">
+            <button class="loc-search-clear" id="locSearchClear" onclick="clearLocSearch()" style="display:none;">
+              <i class="fa fa-times"></i>
+            </button>
+          </div>
+          <button class="btn-loc-search" id="locSearchBtn" onclick="doLocSearch()">
+            <i class="fa fa-search-location"></i>
+          </button>
+        </div>
+
+        <!-- 検索候補ドロップダウン -->
+        <div class="loc-suggestions" id="locSuggestions"></div>
+
+        <!-- マップ本体（常に表示） -->
+        <div class="pick-map-wrap">
+          <div id="locationMap"></div>
+
+          <!-- ピン未設置のヒントオーバーレイ -->
+          <div class="pick-hint-overlay" id="pickHint">
+            <div class="pick-hint-inner">
+              <i class="fa fa-map-marker-alt"></i>
+              <span>検索するかマップをクリックして<br>スポットの場所を指定</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ピン設置後に表示 -->
+        <div class="location-confirm" id="locationConfirm">
+          <i class="fa fa-check-circle"></i>
+          <div class="location-confirm-text">
+            <div id="locationName" class="loc-address">取得中…</div>
+            <div class="loc-drag-hint">ピンをドラッグして微調整できます</div>
+          </div>
+          <button class="btn-location-reset" onclick="resetLocation()">
+            <i class="fa fa-redo"></i> リセット
+          </button>
+        </div>
+      </div>
+
+      <!-- 説明 -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-align-left"></i> 説明・コメント
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">スポットの説明</label>
+          <textarea class="form-textarea" id="spotDesc"
+                    placeholder="このスポットの魅力、アクセス情報、おすすめポイントなどを教えてください。"
+                    maxlength="500"
+                    oninput="updatePreview(); countChars(this, 'descCount', 500)"></textarea>
+          <div class="char-count" id="descCount">0 / 500</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">アクセス・駐車場</label>
+          <textarea class="form-textarea" id="spotAccess"
+                    placeholder="最寄りのインターや道の駅、駐車場の情報など"
+                    style="min-height:80px;"
+                    maxlength="200"
+                    oninput="countChars(this, 'accessCount', 200)"></textarea>
+          <div class="char-count" id="accessCount">0 / 200</div>
+        </div>
+      </div>
+
+      <!-- タグ -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-tag"></i> タグ
+        </div>
+        <div class="tag-wrap" id="tagWrap" onclick="document.getElementById('tagInput').focus()">
+          <input class="tag-input" id="tagInput" type="text"
+                 placeholder="タグを入力して Enter"
+                 onkeydown="handleTagKey(event)">
+        </div>
+        <div class="tag-hint">例：#絶景 #ソロツーリング #初心者OK</div>
+      </div>
+
+      <!-- 難易度 & 星評価 -->
+      <div class="post-card">
+        <div class="post-card-title">
+          <i class="fa fa-star"></i> 難易度・評価
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">道の難易度</label>
+          <div class="difficulty-row">
+            <input class="difficulty-slider" type="range" id="diffSlider"
+                   min="1" max="5" value="2"
+                   oninput="updateDiffLabel(this.value)">
+            <div class="difficulty-label" id="diffLabel">初級</div>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">景観スコア（自己評価）</label>
+          <div style="display:flex;gap:6px;align-items:center;margin-top:4px;">
+            <span class="star-btn" data-v="1" onclick="setStars(1)">☆</span>
+            <span class="star-btn" data-v="2" onclick="setStars(2)">☆</span>
+            <span class="star-btn" data-v="3" onclick="setStars(3)">☆</span>
+            <span class="star-btn" data-v="4" onclick="setStars(4)">☆</span>
+            <span class="star-btn" data-v="5" onclick="setStars(5)">☆</span>
+            <span id="starLabel" style="font-size:12px;color:rgba(255,255,255,0.35);margin-left:8px;">未評価</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── 右カラム：プレビュー ── -->
+    <div class="post-side-col">
+
+      <!-- カードプレビュー -->
+      <div class="preview-card">
+        <div class="preview-head">
+          <span class="preview-head-title">プレビュー</span>
+          <span class="preview-badge">カード表示イメージ</span>
+        </div>
+        <div class="preview-img-wrap" id="previewImgWrap">
+          <div class="preview-img-placeholder"><i class="fa fa-image"></i></div>
+        </div>
+        <div class="preview-body">
+          <div class="preview-spot-name empty" id="previewName">スポット名が入ります</div>
+          <div class="preview-pref-tag">
+            <i class="fa fa-map-marker-alt"></i>
+            <span id="previewPrefText">都県未選択</span>
+          </div>
+          <div class="preview-desc empty" id="previewDesc">説明が入ります</div>
+          <div class="preview-tags-row" id="previewTags"></div>
+          <div class="preview-meta">
+            <div class="preview-meta-item"><i class="fa fa-heart"></i> 0</div>
+            <div class="preview-meta-item"><i class="fa fa-comment"></i> 0</div>
+            <div class="preview-meta-item"><i class="fa fa-star"></i>
+              <span id="previewScore">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- アドバイス -->
+      <div class="tips-card">
+        <div class="tips-head"><i class="fa fa-lightbulb"></i> 投稿のコツ</div>
+        <div class="tips-list">
+          <div class="tips-item">写真は晴れた日・光の良い時間帯に撮るとスコアが上がりやすいです</div>
+          <div class="tips-item">住所を入力するとマップに正確なピンが立ちます</div>
+          <div class="tips-item">タグをつけると検索で発見されやすくなります</div>
+          <div class="tips-item">難易度は正直に入力しましょう。安全のためです</div>
+          <div class="tips-item">投稿後もマイページから編集できます</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 完了モーダル -->
+<div class="post-done-overlay" id="doneOverlay">
+  <div class="post-done-modal">
+    <div class="done-icon"><i class="fa fa-check"></i></div>
+    <div class="done-title">投稿しました！</div>
+    <div class="done-sub">スポットが登録されました。<br>他のライダーに共有されるまで少々お待ちください。</div>
+    <div class="done-btns">
+      <button class="btn-done-primary" onclick="goToMap()">
+        <i class="fa fa-map" style="margin-right:6px;"></i>マップで確認する
+      </button>
+      <button class="btn-done-secondary" onclick="closeDone()">続けて投稿する</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ── 星ボタン ── */
+  .star-btn {
+    font-size: 24px;
+    color: rgba(255,255,255,0.2);
+    cursor: pointer;
+    transition: color 0.15s, transform 0.1s;
+    line-height: 1;
+  }
+  .star-btn:hover, .star-btn.active { color: #c8a45a; }
+  .star-btn:active { transform: scale(0.85); }
+
+  /* ── 場所検索バー ── */
+  .loc-search-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .loc-search-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 0 12px;
+    gap: 8px;
+    transition: border-color 0.2s;
+  }
+  .loc-search-wrap:focus-within {
+    border-color: rgba(200, 164, 90, 0.5);
+    background: rgba(200, 164, 90, 0.04);
+  }
+  .loc-search-icon {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .loc-search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+    padding: 11px 0;
+    font-family: inherit;
+  }
+  .loc-search-input::placeholder { color: rgba(255, 255, 255, 0.22); }
+  .loc-search-clear {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 12px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .loc-search-clear:hover { color: rgba(255, 255, 255, 0.6); }
+
+  .btn-loc-search {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    background: rgba(200, 164, 90, 0.15);
+    border: 1px solid rgba(200, 164, 90, 0.3);
+    color: #c8a45a;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-loc-search:hover {
+    background: rgba(200, 164, 90, 0.28);
+    transform: translateY(-1px);
+  }
+  .btn-loc-search:active { transform: translateY(0); }
+  .btn-loc-search.loading { opacity: 0.55; cursor: default; pointer-events: none; }
+
+  /* ── 検索候補ドロップダウン ── */
+  .loc-suggestions {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    display: none;
+  }
+  .loc-suggestions.open { display: block; animation: mapSlideIn 0.2s ease; }
+
+  .loc-suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    transition: background 0.15s;
+  }
+  .loc-suggestion-item:last-child { border-bottom: none; }
+  .loc-suggestion-item:hover { background: rgba(200, 164, 90, 0.07); }
+
+  .sug-icon {
+    color: #c8a45a;
+    font-size: 13px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .sug-body { flex: 1; overflow: hidden; }
+  .sug-name {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.82);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sug-detail {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.32);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .loc-sug-empty {
+    padding: 14px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* ── マップ選択（クリックで位置指定） ── */
+  .pick-map-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: crosshair;
+  }
+
+  #locationMap {
+    height: 280px;
+    background: #111;
+  }
+  #locationMap .leaflet-container { background: #111; }
+
+  /* ピン未設置のヒントオーバーレイ */
+  .pick-hint-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 500;
+    transition: opacity 0.35s;
+  }
+  .pick-hint-overlay.hidden { opacity: 0; }
+
+  .pick-hint-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10, 14, 22, 0.72);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(200, 164, 90, 0.25);
+    border-radius: 14px;
+    padding: 18px 28px;
+    text-align: center;
+    animation: hintPulse 2.4s ease-in-out infinite;
+  }
+  .pick-hint-inner i {
+    font-size: 26px;
+    color: #c8a45a;
+  }
+  .pick-hint-inner span {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+  }
+
+  @keyframes hintPulse {
+    0%, 100% { transform: translateY(0);    opacity: 1;    }
+    50%       { transform: translateY(-4px); opacity: 0.82; }
+  }
+
+  /* ピン設置後の確認バー */
+  .location-confirm {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 14px;
+    margin-top: 10px;
+    background: rgba(116, 214, 128, 0.07);
+    border: 1px solid rgba(116, 214, 128, 0.16);
+    border-radius: 10px;
+    animation: mapSlideIn 0.3s ease;
+  }
+  .location-confirm.show { display: flex; }
+  .location-confirm > i {
+    color: #74d680;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .location-confirm-text {
+    flex: 1;
+    overflow: hidden;
+  }
+  .loc-address {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .loc-drag-hint {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.25);
+    margin-top: 2px;
+  }
+
+  .btn-location-reset {
+    flex-shrink: 0;
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 5px 11px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: inherit;
+  }
+  .btn-location-reset:hover {
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+
+  @keyframes mapSlideIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0);   }
+  }
+
+  /* カスタムピン */
+  .loc-pin-inner {
+    width: 22px;
+    height: 22px;
+    border-radius: 50% 50% 50% 0;
+    background: linear-gradient(135deg, #c8a45a, #e0b96a);
+    transform: rotate(-45deg);
+    border: 2px solid rgba(255, 255, 255, 0.75);
+    box-shadow: 0 3px 14px rgba(200, 164, 90, 0.7);
+  }
+</style>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  /* ============================
+     PREF — 解除済み都県のみ表示
+     ============================ */
+  const PREF_LABELS = {
+    tokyo:    '東京都',
+    kanagawa: '神奈川県',
+    saitama:  '埼玉県',
+    chiba:    '千葉県',
+    ibaraki:  '茨城県',
+    tochigi:  '栃木県',
+    gunma:    '群馬県',
+  };
+
+  function buildPrefSelect() {
+    const unlocked = JSON.parse(localStorage.getItem('sk_unlocked') || '["tokyo"]');
+    const sel = document.getElementById('prefSelect');
+    Object.entries(PREF_LABELS).forEach(([id, label]) => {
+      if (!unlocked.includes(id)) return;
+      const opt = document.createElement('option');
+      opt.value = id;
+      opt.textContent = label;
+      sel.appendChild(opt);
+    });
+  }
+
+  /* ============================
+     写真アップロード
+     ============================ */
+  const photos = [];
+
+  function handleFiles(files) {
+    Array.from(files).forEach(f => {
+      if (photos.length >= 10) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        photos.push(e.target.result);
+        renderPhotoGrid();
+        updatePreviewImg();
+      };
+      reader.readAsDataURL(f);
+    });
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('uploadArea').classList.add('drag-over');
+  }
+  function handleDragLeave() {
+    document.getElementById('uploadArea').classList.remove('drag-over');
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('uploadArea').classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+  }
+
+  function renderPhotoGrid() {
+    const grid = document.getElementById('photoGrid');
+    grid.innerHTML = '';
+    photos.forEach((src, i) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'photo-thumb';
+      thumb.innerHTML = `
+        <img src="${src}" alt="">
+        <div class="photo-thumb-del" onclick="removePhoto(${i})"><i class="fa fa-times"></i></div>
+      `;
+      grid.appendChild(thumb);
+    });
+    if (photos.length < 10) {
+      const add = document.createElement('div');
+      add.className = 'photo-add-btn';
+      add.innerHTML = '<i class="fa fa-plus"></i>';
+      add.onclick = () => document.getElementById('photoInput').click();
+      grid.appendChild(add);
+    }
+  }
+
+  function removePhoto(i) {
+    photos.splice(i, 1);
+    renderPhotoGrid();
+    updatePreviewImg();
+  }
+
+  function updatePreviewImg() {
+    const wrap = document.getElementById('previewImgWrap');
+    wrap.innerHTML = photos.length > 0
+      ? `<img src="${photos[0]}" alt="">`
+      : '<div class="preview-img-placeholder"><i class="fa fa-image"></i></div>';
+  }
+
+  /* ============================
+     位置情報 — 場所検索
+     ============================ */
+  let searchTimer = null;
+
+  function onLocSearchInput() {
+    const val = document.getElementById('locSearchInput').value.trim();
+    document.getElementById('locSearchClear').style.display = val ? '' : 'none';
+    clearTimeout(searchTimer);
+    if (!val) { closeSuggestions(); return; }
+    // 300ms デバウンスで候補を取得
+    searchTimer = setTimeout(() => fetchSuggestions(val), 300);
+  }
+
+  async function fetchSuggestions(query) {
+    try {
+      const url  = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=jp&accept-language=ja`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      renderSuggestions(data);
+    } catch {
+      closeSuggestions();
+    }
+  }
+
+  function renderSuggestions(results) {
+    const box = document.getElementById('locSuggestions');
+    if (!results.length) {
+      box.innerHTML = '<div class="loc-sug-empty">候補が見つかりませんでした</div>';
+      box.classList.add('open');
+      return;
+    }
+    box.innerHTML = results.map((r, i) => {
+      const parts = r.display_name.split(',');
+      const name   = parts[0].trim();
+      const detail = parts.slice(1, 4).join(',').trim();
+      return `
+        <div class="loc-suggestion-item" onclick="selectSuggestion(${r.lat}, ${r.lon}, '${r.display_name.replace(/'/g, "\\'")}')">
+          <i class="fa fa-map-marker-alt sug-icon"></i>
+          <div class="sug-body">
+            <div class="sug-name">${name}</div>
+            <div class="sug-detail">${detail}</div>
+          </div>
+        </div>`;
+    }).join('');
+    box.classList.add('open');
+  }
+
+  function selectSuggestion(lat, lng, displayName) {
+    closeSuggestions();
+    document.getElementById('locSearchInput').value = displayName.split(',')[0].trim();
+    document.getElementById('locSearchClear').style.display = '';
+    flyAndPin(parseFloat(lat), parseFloat(lng), displayName);
+  }
+
+  async function doLocSearch() {
+    const query = document.getElementById('locSearchInput').value.trim();
+    if (!query) return;
+
+    const btn = document.getElementById('locSearchBtn');
+    btn.classList.add('loading');
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+    closeSuggestions();
+
+    try {
+      const url  = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&countrycodes=jp&accept-language=ja`;
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      if (!data.length) {
+        renderSuggestions([]);
+      } else if (data.length === 1) {
+        selectSuggestion(data[0].lat, data[0].lon, data[0].display_name);
+      } else {
+        renderSuggestions(data);
+      }
+    } catch {
+      /* 無視 */
+    }
+
+    btn.classList.remove('loading');
+    btn.innerHTML = '<i class="fa fa-search-location"></i>';
+  }
+
+  function clearLocSearch() {
+    document.getElementById('locSearchInput').value = '';
+    document.getElementById('locSearchClear').style.display = 'none';
+    closeSuggestions();
+  }
+
+  function closeSuggestions() {
+    document.getElementById('locSuggestions').classList.remove('open');
+  }
+
+  // マップを飛ばしてピンを立てる（検索結果から呼ぶ）
+  function flyAndPin(lat, lng, displayName) {
+    if (locMap) locMap.flyTo([lat, lng], 14, { duration: 0.8 });
+    placePinAt(lat, lng);
+    // リバースジオコードは省略してそのまま表示名を使う
+    document.getElementById('locationName').textContent = displayName;
+  }
+
+  // 候補以外をクリックしたら閉じる
+  document.addEventListener('click', e => {
+    if (!e.target.closest('#locSuggestions') && !e.target.closest('#locSearchWrap')) {
+      closeSuggestions();
+    }
+  });
+
+  /* ============================
+     位置情報 — クリックでピン設置
+     ============================ */
+  let locMap    = null;
+  let locMarker = null;
+  let locLatLng = null;   // { lat, lng } — 投稿データに使用
+
+  const pinIcon = () => L.divIcon({
+    className: '',
+    html: '<div class="loc-pin-inner"></div>',
+    iconSize:    [22, 22],
+    iconAnchor:  [11, 22],
+    popupAnchor: [0, -26],
+  });
+
+  function initLocMap() {
+    locMap = L.map('locationMap', {
+      center:            [36.0, 139.6],   // 関東中心
+      zoom:              9,
+      zoomControl:       true,
+      attributionControl: false,
+    });
+
+    // CartoDB ダークタイル（main.html と同じ）
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19, subdomains: 'abcd',
+    }).addTo(locMap);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19, subdomains: 'abcd',
+    }).addTo(locMap);
+
+    // マップクリック → ピン設置
+    locMap.on('click', e => {
+      placePinAt(e.latlng.lat, e.latlng.lng);
+    });
+  }
+
+  function placePinAt(lat, lng) {
+    locLatLng = { lat, lng };
+
+    if (!locMarker) {
+      locMarker = L.marker([lat, lng], {
+        icon:      pinIcon(),
+        draggable: true,
+      }).addTo(locMap);
+
+      // ドラッグで微調整
+      locMarker.on('dragend', e => {
+        const { lat: la, lng: lo } = e.target.getLatLng();
+        locLatLng = { lat: la, lng: lo };
+        reverseGeocode(la, lo);
+      });
+    } else {
+      locMarker.setLatLng([lat, lng]);
+    }
+
+    // ヒントオーバーレイを隠す
+    document.getElementById('pickHint').classList.add('hidden');
+
+    // 確認バーを表示
+    document.getElementById('locationConfirm').classList.add('show');
+    document.getElementById('locationName').textContent = '取得中…';
+
+    // リバースジオコーディング
+    reverseGeocode(lat, lng);
+  }
+
+  async function reverseGeocode(lat, lng) {
+    try {
+      const url  = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&accept-language=ja`;
+      const res  = await fetch(url);
+      const data = await res.json();
+      const name = data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      document.getElementById('locationName').textContent = name;
+    } catch {
+      document.getElementById('locationName').textContent =
+        `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    }
+  }
+
+  function resetLocation() {
+    locLatLng = null;
+    if (locMarker) { locMap.removeLayer(locMarker); locMarker = null; }
+    document.getElementById('pickHint').classList.remove('hidden');
+    document.getElementById('locationConfirm').classList.remove('show');
+    document.getElementById('locationName').textContent = '取得中…';
+    locMap.setView([36.0, 139.6], 9);
+  }
+
+  /* ============================
+     プレビュー更新
+     ============================ */
+  function updatePreview() {
+    const name   = document.getElementById('spotName').value.trim();
+    const nameEl = document.getElementById('previewName');
+    nameEl.textContent = name || 'スポット名が入ります';
+    nameEl.classList.toggle('empty', !name);
+
+    const prefSel  = document.getElementById('prefSelect');
+    const prefText = prefSel.options[prefSel.selectedIndex]?.text || '都県未選択';
+    document.getElementById('previewPrefText').textContent = prefText;
+
+    const desc   = document.getElementById('spotDesc').value.trim();
+    const descEl = document.getElementById('previewDesc');
+    descEl.textContent = desc || '説明が入ります';
+    descEl.classList.toggle('empty', !desc);
+  }
+
+  /* ============================
+     文字数カウント
+     ============================ */
+  function countChars(el, counterId, max) {
+    const len = el.value.length;
+    const counter = document.getElementById(counterId);
+    counter.textContent = `${len} / ${max}`;
+    counter.classList.toggle('warn', len >= max * 0.85);
+  }
+
+  /* ============================
+     タグ
+     ============================ */
+  const tags = [];
+
+  function handleTagKey(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const val = e.target.value.replace(/^#/, '').trim();
+      if (val && !tags.includes(val) && tags.length < 10) {
+        tags.push(val);
+        e.target.value = '';
+        renderTags();
+        updatePreviewTags();
+      }
+    }
+    if (e.key === 'Backspace' && e.target.value === '' && tags.length > 0) {
+      tags.pop();
+      renderTags();
+      updatePreviewTags();
+    }
+  }
+
+  function renderTags() {
+    const wrap  = document.getElementById('tagWrap');
+    const input = document.getElementById('tagInput');
+    wrap.querySelectorAll('.tag-chip').forEach(c => c.remove());
+    tags.forEach((tag, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip';
+      chip.innerHTML = `#${tag} <button onclick="removeTag(${i})"><i class="fa fa-times"></i></button>`;
+      wrap.insertBefore(chip, input);
+    });
+  }
+
+  function removeTag(i) {
+    tags.splice(i, 1);
+    renderTags();
+    updatePreviewTags();
+  }
+
+  function updatePreviewTags() {
+    document.getElementById('previewTags').innerHTML =
+      tags.slice(0, 4).map(t => `<span class="preview-tag">#${t}</span>`).join('');
+  }
+
+  /* ============================
+     難易度スライダー
+     ============================ */
+  const DIFF_LABELS = ['', '初級', '初中級', '中級', '上級', 'エキスパート'];
+  function updateDiffLabel(v) {
+    document.getElementById('diffLabel').textContent = DIFF_LABELS[v];
+  }
+
+  /* ============================
+     星評価
+     ============================ */
+  let starVal = 0;
+  function setStars(v) {
+    starVal = v;
+    const labels = ['', '★ 普通', '★★ 良い', '★★★ 素晴らしい', '★★★★ 最高！', '★★★★★ 絶景！'];
+    document.querySelectorAll('.star-btn').forEach(btn => {
+      btn.textContent = parseInt(btn.dataset.v) <= v ? '★' : '☆';
+      btn.classList.toggle('active', parseInt(btn.dataset.v) <= v);
+    });
+    document.getElementById('starLabel').textContent = labels[v] || '未評価';
+    document.getElementById('previewScore').textContent = v > 0 ? v + '.0' : '-';
+  }
+
+  /* ============================
+     フィールドフラッシュ（バリデーション）
+     ============================ */
+  function flashField(id) {
+    const el = document.getElementById(id);
+    el.style.borderColor = 'rgba(255,80,80,0.7)';
+    el.style.boxShadow   = '0 0 0 3px rgba(255,80,80,0.12)';
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 1800);
+  }
+
+  /* ============================
+     投稿
+     ============================ */
+  function submitPost() {
+    const name = document.getElementById('spotName').value.trim();
+    const pref = document.getElementById('prefSelect').value;
+
+    if (!name) { flashField('spotName'); return; }
+    if (!pref) { flashField('prefSelect'); return; }
+    if (!locLatLng) {
+      // マップカードをフラッシュ & スクロール
+      const mapWrap = document.querySelector('.pick-map-wrap');
+      mapWrap.style.outline = '2px solid rgba(255,80,80,0.6)';
+      mapWrap.style.boxShadow = '0 0 0 4px rgba(255,80,80,0.1)';
+      mapWrap.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setTimeout(() => { mapWrap.style.outline = ''; mapWrap.style.boxShadow = ''; }, 1800);
+      return;
+    }
+
+    // localStorage に保存（後でAPIに置き換え）
+    const postData = {
+      id:         Date.now(),
+      name,
+      pref,
+      lat:        locLatLng.lat,
+      lng:        locLatLng.lng,
+      address:    document.getElementById('locationName').textContent,
+      genre:      document.getElementById('genreSelect').value,
+      time:       document.getElementById('timeSelect').value,
+      desc:       document.getElementById('spotDesc').value.trim(),
+      access:     document.getElementById('spotAccess').value.trim(),
+      tags:       [...tags],
+      difficulty: parseInt(document.getElementById('diffSlider').value),
+      score:      starVal,
+      photo:      photos[0] || null,   // カード表示用にサムネだけ保持
+      postedAt:   new Date().toLocaleDateString('ja-JP'),
+    };
+
+    const existing = JSON.parse(localStorage.getItem('sk_posts') || '[]');
+    existing.push(postData);
+    localStorage.setItem('sk_posts', JSON.stringify(existing));
+
+    document.getElementById('doneOverlay').classList.add('show');
+  }
+
+  function closeDone() {
+    document.getElementById('doneOverlay').classList.remove('show');
+    // フォームリセット
+    ['spotName','spotDesc','spotAccess'].forEach(id => document.getElementById(id).value = '');
+    ['prefSelect','genreSelect','timeSelect'].forEach(id => document.getElementById(id).selectedIndex = 0);
+    document.getElementById('diffSlider').value = 2;
+    document.getElementById('diffLabel').textContent = '初級';
+    photos.length = 0; tags.length = 0; starVal = 0;
+    renderPhotoGrid(); renderTags(); updatePreview(); updatePreviewImg(); updatePreviewTags();
+    setStars(0);
+    document.getElementById('nameCount').textContent   = '0 / 50';
+    document.getElementById('descCount').textContent   = '0 / 500';
+    document.getElementById('accessCount').textContent = '0 / 200';
+    document.querySelectorAll('.star-btn').forEach(b => { b.textContent = '☆'; b.classList.remove('active'); });
+    document.getElementById('starLabel').textContent   = '未評価';
+    document.getElementById('previewScore').textContent = '-';
+    resetLocation();
+  }
+
+  function goToMap() { window.location.href = 'main.html'; }
+
+  /* ============================
+     ドロワー
+     ============================ */
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  /* ============================
+     初期化
+     ============================ */
+  window.addEventListener('load', () => {
+    buildPrefSelect();
+    updateDiffLabel(2);
+    initLocMap();
+  });
+</script>
+</body>
+</html>

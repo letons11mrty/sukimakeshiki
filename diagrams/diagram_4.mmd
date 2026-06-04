@@ -1,0 +1,23 @@
+sequenceDiagram
+    actor User as ユーザー
+    participant UI as UI画面
+    participant API as APIサーバー
+    participant Auth as 認証サービス
+    participant DB as データベース
+    
+    User->>UI: ログイン要求
+    UI->>API: 認証リクエスト
+    API->>Auth: 認証確認
+    Auth-->>API: 認証OK
+    API->>DB: ユーザー情報取得
+    DB-->>API: ユーザーデータ
+    API-->>UI: 認証成功レスポンス
+    UI-->>User: ホーム画面表示
+    
+    User->>UI: データ登録
+    UI->>API: 登録リクエスト
+    API->>API: バリデーション
+    API->>DB: データ保存
+    DB-->>API: 保存完了
+    API-->>UI: 登録完了レスポンス
+    UI-->>User: 完了メッセージ表示

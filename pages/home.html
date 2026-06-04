@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ホーム | バイクコミュニティ</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/home.css">
+</head>
+<body>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">
+    <img src="../images/iron.png" alt="ロゴ">
+    <span>バイクコミュニティ</span>
+  </div>
+  <div class="drawer-menu">
+    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
+    <a href="map.html"><i class="fa fa-map"></i> マップ</a>
+    <a href="post.html"><i class="fa fa-plus-circle"></i> 投稿する</a>
+    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
+    <a href="#"><i class="fa fa-motorcycle"></i> ガレージ</a>
+    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+  </div>
+</nav>
+
+<!-- ===== HOME PAGE ===== -->
+<div id="home-page" class="page active">
+  <header class="home-header">
+    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <div class="header-divider"></div>
+    <span class="region-badge">japan</span>
+  </header>
+
+  <div class="welcome-banner">
+    <img class="banner-img" src="../images/home-image.png" alt="">
+    <div class="banner-grad"></div>
+    <div class="welcome-text">W e l c o m e</div>
+  </div>
+
+  <div class="home-body">
+    <div class="left-col">
+
+      <!-- Resources -->
+      <div class="resources-section">
+        <div class="section-title">Resources</div>
+        <div class="resources-row">
+          <a class="res-item" href="post.html">
+            <div class="res-icon"><i class="fa fa-plus"></i></div>
+            <span class="res-label">Post</span>
+          </a>
+          <a class="res-item" href="main.html">
+            <div class="res-icon"><i class="fa fa-map"></i></div>
+            <span class="res-label">Map</span>
+          </a>
+          <a class="res-item" href="#">
+            <div class="res-icon"><i class="fa fa-bookmark"></i></div>
+            <span class="res-label">favorite</span>
+          </a>
+          <a class="res-item" href="map.html">
+            <div class="res-icon"><i class="fa fa-key"></i></div>
+            <span class="res-label">Unlock</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Information -->
+      <div class="info-section">
+        <div class="info-head">
+          <div class="section-title">Information</div>
+          <span class="info-more">もっと見る</span>
+        </div>
+        <div class="info-list">
+          <div class="info-row">
+            <div class="info-date">2025.4.20</div>
+            <div class="info-title">→ 【キャンペーン】友達招待キャンペーン</div>
+          </div>
+          <div class="info-row">
+            <div class="info-date">2025.4.20</div>
+            <div class="info-title">→ 【機能紹介】新シーズンの準備！メンテナンス記録</div>
+          </div>
+          <div class="info-row">
+            <div class="info-date">2025.4.20</div>
+            <div class="info-title">→ 【重要】定期メンテナンスのお知らせ</div>
+          </div>
+          <div class="info-row">
+            <div class="info-date">2025.4.20</div>
+            <div class="info-title">→ 【アップデート】Ver.1.0.2アップデートのお知らせ</div>
+          </div>
+          <div class="info-row">
+            <div class="info-date">2025.4.20</div>
+            <div class="info-title">→ 【重要】安全な利用に関する注意喚起</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Garage -->
+    <div class="right-col">
+      <div class="section-title">Garage</div>
+      <div class="garage-card">
+        <div class="garage-bike-wrap">
+          <img src="../images/icon.png" alt="バイク">
+        </div>
+        <div class="garage-fields">
+          <input class="garage-input" type="text" placeholder="種類">
+          <input class="garage-input" type="text" placeholder="車体名">
+          <input class="garage-input" type="text" placeholder="排気量">
+          <input class="garage-input" type="text" placeholder="活動時間">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.info-row').forEach((row, i) => {
+      setTimeout(() => row.classList.add('visible'), i * 80);
+    });
+  });
+</script>
+</body>
+</html>

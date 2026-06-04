@@ -1,0 +1,16 @@
+flowchart TD
+    Start([開始]) --> Input[ユーザー入力]
+    Input --> Validate{入力検証}
+    Validate -->|NG| Error[エラー表示]
+    Error --> Input
+    Validate -->|OK| Auth{認証確認}
+    Auth -->|未認証| Login[ログイン画面]
+    Login --> Auth
+    Auth -->|認証済| Process[データ処理]
+    Process --> Save[データ保存]
+    Save --> Check{保存成功?}
+    Check -->|失敗| Retry{リトライ?}
+    Retry -->|Yes| Save
+    Retry -->|No| ErrorEnd[エラー終了]
+    Check -->|成功| Success[完了メッセージ]
+    Success --> End([終了])

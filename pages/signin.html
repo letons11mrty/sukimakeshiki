@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ログイン | すきまけしき</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/signin.css">
+</head>
+<body>
+
+<div id="signin-page" class="page active signin-page">
+
+  <!-- 背景 -->
+  <div class="login-bg"></div>
+  <div class="login-overlay"></div>
+
+
+  <!-- ログインカード -->
+  <div class="signin-wrap">
+    <div class="signin-card">
+
+      <h2 class="signin-title">ログイン</h2>
+
+      <form onsubmit="return false">
+
+        <!-- メールアドレス -->
+        <div class="form-group">
+          <label class="form-label" for="email">メールアドレス</label>
+          <input
+            class="form-input"
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <!-- パスワード -->
+        <div class="form-group">
+          <label class="form-label" for="password">パスワード</label>
+          <div class="input-wrap">
+            <input
+              class="form-input"
+              type="password"
+              id="password"
+              placeholder="パスワードを入力"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-pw" onclick="togglePassword()" aria-label="パスワード表示切替">
+              <i class="fa fa-eye" id="pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- パスワードを忘れ -->
+        <a class="forgot-link" href="#">パスワードをお忘れの場合</a>
+
+        <!-- ログインボタン -->
+        <button type="submit" class="btn-signin">
+          ログイン
+        </button>
+      </form>
+
+      <!-- 区切り -->
+      <div class="signin-divider"><span>または</span></div>
+
+      <!-- 新規登録へ -->
+      <p class="signup-link">
+        アカウントをお持ちでない場合は
+        <a href="../index.html">新規登録はこちら</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('pw-icon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+
+</script>
+</body>
+</html>

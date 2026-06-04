@@ -1,0 +1,36 @@
+graph TB
+    subgraph "システム境界"
+        UC1[ユーザー登録]
+        UC2[ログイン/ログアウト]
+        UC3[商品検索]
+        UC4[商品詳細閲覧]
+        UC5[カート追加]
+        UC6[注文処理]
+        UC7[決済処理]
+        UC8[注文履歴確認]
+        UC9[レビュー投稿]
+        UC10[商品管理]
+        UC11[在庫管理]
+        UC12[売上レポート]
+    end
+    
+    User[一般ユーザー]
+    Admin[管理者]
+    Payment[決済システム]
+    
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+    User --> UC6
+    User --> UC8
+    User --> UC9
+    
+    Admin --> UC2
+    Admin --> UC10
+    Admin --> UC11
+    Admin --> UC12
+    
+    UC7 --> Payment
+    UC6 -.-> UC7

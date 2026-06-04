@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>マップ | すきまけしき</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/home.css">
+  <link rel="stylesheet" href="../css/map.css">
+</head>
+<body>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">
+    <img src="../images/icon.png" alt="ロゴ">
+    <span>すきまけしき</span>
+  </div>
+  <div class="drawer-menu">
+    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
+    <a href="map.html" class="active"><i class="fa fa-map"></i> マップ</a>
+    <a href="post.html"><i class="fa fa-plus-circle"></i> 投稿する</a>
+    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
+    <a href="#"><i class="fa fa-motorcycle"></i> ガレージ</a>
+    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+  </div>
+</nav>
+
+<!-- ===== MAP PAGE ===== -->
+<div id="map-page" class="page active">
+
+  <header class="home-header">
+    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <div class="header-divider"></div>
+    <span class="region-badge">関東</span>
+  </header>
+
+  <div class="map-body">
+
+    <!-- 左：SVGマップ -->
+    <div class="map-col">
+      <div class="map-title-row">
+        <h2 class="map-heading">エリアマップ</h2>
+        <span class="map-sub">エリアをタップしてチェックイン</span>
+      </div>
+
+      <div class="map-svg-wrap">
+        <!--
+          関東7都県 SVG マップ
+          ViewBox: 0 0 490 490
+          座標は地理的位置を近似した簡略化ポリゴン
+        -->
+        <svg viewBox="0 0 490 490" class="kanto-map" id="kantoMap">
+          <defs>
+            <!-- ロック済みのハッチパターン -->
+            <pattern id="lockPattern" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(255,255,255,0.04)" stroke-width="3"/>
+            </pattern>
+          </defs>
+
+          <!-- 群馬県 -->
+          <g class="pref-group" data-id="gunma" onclick="selectPref('gunma')">
+            <polygon
+              id="path-gunma"
+              class="pref-path locked"
+              points="10,10 165,10 178,148 156,222 86,228 10,218"
+            />
+            <text class="pref-label locked-label" id="label-gunma" x="88" y="125">
+              <tspan x="88" dy="0">群馬</tspan>
+            </text>
+            <text class="lock-icon" id="lock-gunma" x="88" y="155">🔒</text>
+          </g>
+
+          <!-- 栃木県 -->
+          <g class="pref-group" data-id="tochigi" onclick="selectPref('tochigi')">
+            <polygon
+              id="path-tochigi"
+              class="pref-path locked"
+              points="162,10 326,10 334,162 318,238 156,226 175,148"
+            />
+            <text class="pref-label locked-label" id="label-tochigi" x="242" y="120">
+              <tspan x="242" dy="0">栃木</tspan>
+            </text>
+            <text class="lock-icon" id="lock-tochigi" x="242" y="150">🔒</text>
+          </g>
+
+          <!-- 茨城県 -->
+          <g class="pref-group" data-id="ibaraki" onclick="selectPref('ibaraki')">
+            <polygon
+              id="path-ibaraki"
+              class="pref-path locked"
+              points="320,10 456,38 468,178 460,300 408,332 346,332 303,250 314,236 328,162"
+            />
+            <text class="pref-label locked-label" id="label-ibaraki" x="392" y="188">
+              <tspan x="392" dy="0">茨城</tspan>
+            </text>
+            <text class="lock-icon" id="lock-ibaraki" x="392" y="218">🔒</text>
+          </g>
+
+          <!-- 埼玉県 -->
+          <g class="pref-group" data-id="saitama" onclick="selectPref('saitama')">
+            <polygon
+              id="path-saitama"
+              class="pref-path locked"
+              points="10,216 86,228 156,224 318,238 322,252 298,336 164,346 38,330"
+            />
+            <text class="pref-label locked-label" id="label-saitama" x="172" y="285">
+              <tspan x="172" dy="0">埼玉</tspan>
+            </text>
+            <text class="lock-icon" id="lock-saitama" x="172" y="315">🔒</text>
+          </g>
+
+          <!-- 東京都（初期解除済み） -->
+          <g class="pref-group" data-id="tokyo" onclick="selectPref('tokyo')">
+            <polygon
+              id="path-tokyo"
+              class="pref-path unlocked"
+              style="fill:#b8943a"
+              points="162,342 298,332 308,398 278,416 226,422 160,405"
+            />
+            <text class="pref-label" id="label-tokyo" x="232" y="375">
+              <tspan x="232" dy="0">東京</tspan>
+            </text>
+          </g>
+
+          <!-- 千葉県 -->
+          <g class="pref-group" data-id="chiba" onclick="selectPref('chiba')">
+            <polygon
+              id="path-chiba"
+              class="pref-path locked"
+              points="296,248 460,296 476,372 460,452 400,472 338,454 292,414 308,398 298,336 302,252"
+            />
+            <text class="pref-label locked-label" id="label-chiba" x="390" y="375">
+              <tspan x="390" dy="0">千葉</tspan>
+            </text>
+            <text class="lock-icon" id="lock-chiba" x="390" y="405">🔒</text>
+          </g>
+
+          <!-- 神奈川県 -->
+          <g class="pref-group" data-id="kanagawa" onclick="selectPref('kanagawa')">
+            <polygon
+              id="path-kanagawa"
+              class="pref-path locked"
+              points="32,400 278,416 296,470 252,480 76,478 24,444"
+            />
+            <text class="pref-label locked-label" id="label-kanagawa" x="160" y="448">
+              <tspan x="160" dy="0">神奈川</tspan>
+            </text>
+            <text class="lock-icon" id="lock-kanagawa" x="160" y="468">🔒</text>
+          </g>
+        </svg>
+      </div>
+
+      <!-- 凡例 -->
+      <div class="map-legend">
+        <span class="legend-item">
+          <span class="legend-dot unlocked"></span>解除済み
+        </span>
+        <span class="legend-item">
+          <span class="legend-dot locked"></span>未解除
+        </span>
+      </div>
+    </div>
+
+    <!-- 右：情報パネル -->
+    <div class="info-col">
+
+      <!-- 解除進捗 -->
+      <div class="unlock-progress">
+        <div class="progress-label"><i class="fa fa-unlock-alt"></i> 解除進捗 — 関東</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 7 エリア解除</div>
+      </div>
+
+      <!-- 都県パネル -->
+      <div class="pref-panel" id="prefPanel">
+        <div class="pref-select-hint" id="selectHint">
+          ← エリアを選択してください
+        </div>
+
+        <!-- 都県情報（JS で表示切替） -->
+        <div id="prefDetail" style="display:none; flex-direction:column; gap:16px;">
+
+          <div class="pref-header">
+            <div class="pref-name" id="detailName">—</div>
+            <div class="pref-status" id="detailStatus">—</div>
+          </div>
+
+          <div class="pref-stats">
+            <div class="stat-cell" id="statSpots">
+              <div class="stat-cell-label"><i class="fa fa-map-marker-alt"></i> スポット数</div>
+              <div class="stat-cell-value" id="valSpots">—</div>
+            </div>
+            <div class="stat-cell" id="statPosts">
+              <div class="stat-cell-label"><i class="fa fa-images"></i> 投稿数</div>
+              <div class="stat-cell-value" id="valPosts">—</div>
+            </div>
+            <div class="stat-cell" id="statRiders">
+              <div class="stat-cell-label"><i class="fa fa-user"></i> ライダー数</div>
+              <div class="stat-cell-value" id="valRiders">—</div>
+            </div>
+            <div class="stat-cell" id="statRoutes">
+              <div class="stat-cell-label"><i class="fa fa-route"></i> ルート数</div>
+              <div class="stat-cell-value" id="valRoutes">—</div>
+            </div>
+          </div>
+
+          <button class="btn-checkin" id="btnCheckin" onclick="doCheckin()">
+            <i class="fa fa-location-arrow" id="checkinIcon"></i>
+            <span id="checkinLabel">チェックイン</span>
+          </button>
+
+          <div class="checkin-date" id="checkinDate"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- トースト通知 -->
+<div class="unlock-toast" id="unlockToast"></div>
+
+<script>
+/* =====================================================
+   データ定義
+   ===================================================== */
+const PREF_DATA = {
+  gunma:    { name:'群馬県',  spots:143, posts:1089, riders:1567, routes:48,  color:'#3d5a6e' },
+  tochigi:  { name:'栃木県',  spots:112, posts:845,  riders:1389, routes:38,  color:'#3d6e5a' },
+  ibaraki:  { name:'茨城県',  spots:98,  posts:734,  riders:1203, routes:32,  color:'#5a6e3d' },
+  saitama:  { name:'埼玉県',  spots:134, posts:987,  riders:1654, routes:44,  color:'#6e5a3d' },
+  tokyo:    { name:'東京都',  spots:245, posts:1832,  riders:3241, routes:86,  color:'#b8943a' },
+  chiba:    { name:'千葉県',  spots:156, posts:1124,  riders:1872, routes:52,  color:'#5a3d6e' },
+  kanagawa: { name:'神奈川県', spots:189, posts:1456,  riders:2103, routes:62,  color:'#3d4d6e' },
+};
+
+const STORAGE_KEY = 'sk_unlocked';
+const CHECKIN_KEY = 'sk_checkins';
+
+/* =====================================================
+   状態管理
+   ===================================================== */
+let selectedId = null;
+
+function loadUnlocked() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || ['tokyo'];
+  } catch { return ['tokyo']; }
+}
+
+function saveUnlocked(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function loadCheckins() {
+  try {
+    return JSON.parse(localStorage.getItem(CHECKIN_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveCheckin(id) {
+  const checkins = loadCheckins();
+  checkins[id] = new Date().toLocaleDateString('ja-JP', {
+    year:'numeric', month:'2-digit', day:'2-digit'
+  });
+  localStorage.setItem(CHECKIN_KEY, JSON.stringify(checkins));
+}
+
+/* =====================================================
+   マップ描画
+   ===================================================== */
+function renderMap() {
+  const unlocked = loadUnlocked();
+
+  Object.keys(PREF_DATA).forEach(id => {
+    const path  = document.getElementById('path-' + id);
+    const label = document.getElementById('label-' + id);
+    const lock  = document.getElementById('lock-' + id);
+
+    if (!path) return;
+    const isUnlocked = unlocked.includes(id);
+
+    if (isUnlocked) {
+      path.classList.remove('locked');
+      path.classList.add('unlocked');
+      path.style.fill = PREF_DATA[id].color;
+      if (label) {
+        label.classList.remove('locked-label');
+      }
+      if (lock) lock.style.display = 'none';
+    } else {
+      path.classList.add('locked');
+      path.classList.remove('unlocked');
+      path.style.fill = '';
+      if (label) label.classList.add('locked-label');
+      if (lock) lock.style.display = '';
+    }
+
+    // 選択状態
+    if (id === selectedId) {
+      path.classList.add('selected');
+    } else {
+      path.classList.remove('selected');
+    }
+  });
+
+  updateProgress();
+}
+
+/* =====================================================
+   進捗バー
+   ===================================================== */
+function updateProgress() {
+  const unlocked = loadUnlocked();
+  const count = unlocked.length;
+  const total = Object.keys(PREF_DATA).length;
+  const pct   = Math.round(count / total * 100);
+
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent =
+    count + ' / ' + total + ' エリア解除';
+}
+
+/* =====================================================
+   エリア選択
+   ===================================================== */
+function selectPref(id) {
+  selectedId = id;
+  renderMap();
+  showDetail(id);
+}
+
+function showDetail(id) {
+  const data     = PREF_DATA[id];
+  const unlocked = loadUnlocked();
+  const checkins = loadCheckins();
+  const isUnlocked = unlocked.includes(id);
+
+  document.getElementById('selectHint').style.display  = 'none';
+  const detail = document.getElementById('prefDetail');
+  detail.style.display = 'flex';
+
+  // 名前
+  document.getElementById('detailName').textContent = data.name;
+
+  // ステータスバッジ
+  const statusEl = document.getElementById('detailStatus');
+  if (isUnlocked) {
+    statusEl.className = 'pref-status unlocked';
+    statusEl.innerHTML = '<i class="fa fa-check"></i> 解除済み';
+  } else {
+    statusEl.className = 'pref-status locked';
+    statusEl.innerHTML = '<i class="fa fa-lock"></i> 未解除';
+  }
+
+  // 統計（未解除はぼかす）
+  const blur = !isUnlocked;
+  ['Spots','Posts','Riders','Routes'].forEach(k => {
+    document.getElementById('stat' + k).classList.toggle('blurred', blur);
+  });
+  document.getElementById('valSpots').textContent  = data.spots.toLocaleString();
+  document.getElementById('valPosts').textContent  = data.posts.toLocaleString();
+  document.getElementById('valRiders').textContent = data.riders.toLocaleString();
+  document.getElementById('valRoutes').textContent = data.routes.toLocaleString();
+
+  // チェックインボタン
+  const btn   = document.getElementById('btnCheckin');
+  const icon  = document.getElementById('checkinIcon');
+  const label = document.getElementById('checkinLabel');
+  const dateEl= document.getElementById('checkinDate');
+
+  if (isUnlocked) {
+    btn.className = 'btn-checkin done';
+    icon.className = 'fa fa-check';
+    label.textContent = 'チェックイン済み';
+    btn.disabled = true;
+    if (checkins[id]) {
+      dateEl.textContent = 'チェックイン日: ' + checkins[id];
+    } else {
+      dateEl.textContent = '';
+    }
+  } else {
+    btn.className = 'btn-checkin available';
+    btn.disabled = false;
+    icon.className = 'fa fa-location-arrow';
+    label.textContent = 'このエリアにチェックイン';
+    dateEl.textContent = '';
+  }
+}
+
+/* =====================================================
+   チェックイン（解除）
+   ===================================================== */
+function doCheckin() {
+  if (!selectedId) return;
+  const unlocked = loadUnlocked();
+  if (unlocked.includes(selectedId)) return;
+
+  // 解除処理
+  unlocked.push(selectedId);
+  saveUnlocked(unlocked);
+  saveCheckin(selectedId);
+
+  // アニメーション
+  const path = document.getElementById('path-' + selectedId);
+  if (path) {
+    path.classList.add('unlocking');
+    setTimeout(() => path.classList.remove('unlocking'), 1200);
+  }
+
+  // 画面更新
+  renderMap();
+  showDetail(selectedId);
+  showToast('🎉 ' + PREF_DATA[selectedId].name + ' を解除しました！');
+}
+
+/* =====================================================
+   トースト通知
+   ===================================================== */
+function showToast(msg) {
+  const toast = document.getElementById('unlockToast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+/* =====================================================
+   ドロワー
+   ===================================================== */
+function openDrawer() {
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+}
+
+/* =====================================================
+   初期化
+   ===================================================== */
+window.addEventListener('load', () => {
+  renderMap();
+
+  // ドロワーのアクティブリンク
+  document.querySelectorAll('.drawer-menu a').forEach(a => {
+    if (a.href === location.href) a.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
