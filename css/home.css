@@ -354,7 +354,13 @@
 
   .right-col { padding: 20px 18px; }
 
-  /* Resources アイコン間隔を詰める */
-  .resources-row { gap: 20px; }
+  /* Resources：均等に配置 */
+  .resources-row {
+    gap: 0;
+    justify-content: space-around;
+  }
   .res-icon { width: 50px; height: 50px; font-size: 22px; }
+
+  /* ガレージ入力（iOS自動ズーム防止） */
+  .garage-input { font-size: 16px; }
 }

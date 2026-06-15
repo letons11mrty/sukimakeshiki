@@ -580,6 +580,25 @@
   /* ヘッダー */
   .post-header-title { font-size: 14px; }
   .btn-post-submit   { padding: 8px 16px; font-size: 12px; }
+
+  /* フォーム入力のフォントサイズ（iOS自動ズーム防止） */
+  .form-input,
+  .form-textarea,
+  .form-select,
+  .loc-search-input,
+  .tag-input {
+    font-size: 16px;
+  }
+}
+
+/* タッチデバイス：写真削除ボタンを常時表示 */
+@media (pointer: coarse) {
+  .photo-thumb-del {
+    opacity: 1;
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
 }
 
 /* ── ドロワー（shared） ── */

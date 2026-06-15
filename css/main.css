@@ -748,9 +748,24 @@
   .seg-divider { display: none; }
   .search-bar-wrap { border-radius: 8px; }
 
+  /* 検索入力（iOS自動ズーム防止） */
+  .seg-input { font-size: 16px; }
+
   /* ソートバー */
-  .sort-tabs { overflow-x: auto; padding-bottom: 2px; }
-  .sort-tab  { white-space: nowrap; flex-shrink: 0; }
+  .sort-bar { gap: 8px; }
+  .sort-tabs {
+    overflow-x: auto;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sort-tabs::-webkit-scrollbar { display: none; }
+  .sort-tab  {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 7px 14px; /* タップ領域を広げる */
+  }
+  .view-toggles { display: none; } /* モバイルでは不要 */
 
   /* スポットカード：横並び→縦並び */
   .spot-card {
@@ -760,11 +775,11 @@
     height: 180px;
   }
 
-  /* マップパネル：下部に固定高さで表示 */
+  /* マップパネル：上部に固定高さで表示 */
   .map-panel {
     border-left: none;
     border-top: 1px solid #242424;
-    order: -1; /* スポットリストの上に */
+    order: -1;
   }
   .map-sticky {
     position: static;
