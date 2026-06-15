@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "sk-app",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "3456"],
+      "name": "SK",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3456", "."],
       "port": 3456
     }
   ]
