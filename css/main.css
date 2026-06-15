@@ -92,6 +92,11 @@
   cursor: pointer;
 }
 
+.seg-input option {
+  background: #1e1e1e;
+  color: rgba(255,255,255,0.85);
+}
+
 .seg-divider {
   width: 1px;
   height: 28px;
@@ -501,10 +506,10 @@
 }
 .page-btn {
   width: 34px; height: 34px;
-  background: #1c1c1c;
-  border: 1px solid #2a2a2a;
+  background: #2a2a2a;
+  border: 1px solid #3a3a3a;
   border-radius: 7px;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.75);
   font-size: 13px;
   cursor: pointer;
   font-family: inherit;
@@ -727,11 +732,9 @@
    レスポンシブ
    ============================== */
 @media (max-width: 1023px) {
-  /* タブレット：フィルターを隠す */
   .main-layout {
     grid-template-columns: 1fr 320px;
   }
-  .filter-panel { display: none; }
 }
 
 @media (max-width: 767px) {
