@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新規登録 | すきまけしき</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/fa/all.min.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/login.css">
+  <link rel="stylesheet" href="../css/signin.css">
+</head>
+<body>
+
+<div id="signin-page" class="page active signin-page">
+
+  <!-- 背景 -->
+  <div class="login-bg"></div>
+  <div class="login-overlay"></div>
+
+  <!-- 登録カード -->
+  <div class="signin-wrap">
+    <div class="signin-card">
+
+      <h2 class="signin-title">新規登録</h2>
+      <p class="signin-sub">すきまけしきに参加して<br>最高の景色を共有しよう</p>
+
+      <form onsubmit="return false">
+
+        <!-- ユーザー名 -->
+        <div class="form-group">
+          <label class="form-label" for="username">ユーザー名</label>
+          <input
+            class="form-input"
+            type="text"
+            id="username"
+            placeholder="例：yamada_rider"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <!-- メールアドレス -->
+        <div class="form-group">
+          <label class="form-label" for="email">メールアドレス</label>
+          <input
+            class="form-input"
+            type="email"
+            id="email"
+            placeholder="example@email.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <!-- パスワード -->
+        <div class="form-group">
+          <label class="form-label" for="password">パスワード</label>
+          <div class="input-wrap">
+            <input
+              class="form-input"
+              type="password"
+              id="password"
+              placeholder="8文字以上で入力"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pw" onclick="togglePassword('password','pw-icon')" aria-label="パスワード表示切替">
+              <i class="fa fa-eye" id="pw-icon"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- パスワード確認 -->
+        <div class="form-group">
+          <label class="form-label" for="password2">パスワード（確認）</label>
+          <div class="input-wrap">
+            <input
+              class="form-input"
+              type="password"
+              id="password2"
+              placeholder="もう一度入力"
+              autocomplete="new-password"
+              required
+            >
+            <button type="button" class="toggle-pw" onclick="togglePassword('password2','pw2-icon')" aria-label="パスワード表示切替">
+              <i class="fa fa-eye" id="pw2-icon"></i>
+            </button>
+          </div>
+          <div class="pw-match-msg" id="pwMatchMsg"></div>
+        </div>
+
+        <!-- 利用規約 -->
+        <label class="terms-check">
+          <input type="checkbox" id="termsCheck">
+          <span><a href="#" class="terms-link">利用規約</a>・<a href="#" class="terms-link">プライバシーポリシー</a>に同意する</span>
+        </label>
+
+        <!-- 登録ボタン -->
+        <button type="submit" class="btn-signin" onclick="doRegister()">
+          アカウントを作成
+        </button>
+      </form>
+
+      <!-- 区切り -->
+      <div class="signin-divider"><span>または</span></div>
+
+      <!-- ログインリンク -->
+      <p class="signup-link">
+        すでにアカウントをお持ちの方は
+        <a href="../index.html">ログインはこちら</a>
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePassword(inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon  = document.getElementById(iconId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+  }
+
+  document.getElementById('password2').addEventListener('input', () => {
+    const pw1 = document.getElementById('password').value;
+    const pw2 = document.getElementById('password2').value;
+    const msg = document.getElementById('pwMatchMsg');
+    if (!pw2) { msg.textContent = ''; return; }
+    if (pw1 === pw2) {
+      msg.textContent = '✓ パスワードが一致しています';
+      msg.style.color = 'rgba(255,255,255,0.5)';
+    } else {
+      msg.textContent = 'パスワードが一致しません';
+      msg.style.color = 'rgba(255,100,100,0.8)';
+    }
+  });
+
+  function doRegister() {
+    const terms = document.getElementById('termsCheck');
+    if (!terms.checked) {
+      alert('利用規約に同意してください');
+      return;
+    }
+    const pw1 = document.getElementById('password').value;
+    const pw2 = document.getElementById('password2').value;
+    if (pw1 !== pw2) {
+      alert('パスワードが一致しません');
+      return;
+    }
+    // 登録処理（仮）→ ホームへ
+    document.getElementById('signin-page').style.transition = 'opacity 0.4s ease';
+    document.getElementById('signin-page').style.opacity = '0';
+    setTimeout(() => { window.location.href = 'home.html'; }, 400);
+  }
+</script>
+</body>
+</html>

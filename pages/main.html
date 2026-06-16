@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>すきまけしき</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/fa/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/main.css">
@@ -106,64 +106,68 @@
     </div>
   </header>
 
-  <!-- SORT BAR -->
-  <div class="sort-bar">
-    <div class="result-count"><span class="count-num">248</span> 件のスポット</div>
-    <div class="sort-tabs">
-      <button class="sort-tab active">おすすめ順</button>
-      <button class="sort-tab">評価が高い順</button>
-      <button class="sort-tab">距離が近い順</button>
-      <button class="sort-tab">お気に入り数順</button>
-    </div>
-    <div class="view-toggles">
-      <button class="view-btn active" title="リスト表示"><i class="fa fa-list"></i></button>
-      <button class="view-btn" title="グリッド表示"><i class="fa fa-th"></i></button>
-    </div>
-  </div>
-
   <!-- MAIN LAYOUT -->
   <div class="main-layout">
 
+    <!-- パネル開閉ボタン（パネル外に配置） -->
+    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="toggleSpotsPanel()" title="パネルを閉じる">
+      <i class="fa fa-chevron-left" id="panelToggleIcon"></i>
+    </button>
 
-    <!-- ===== CENTER: SPOT LIST ===== -->
-    <section class="spot-list">
+    <!-- ===== FLOATING SPOTS PANEL ===== -->
+    <div class="spots-float-panel" id="spotsFloatPanel">
+
+      <!-- SORT BAR -->
+      <div class="sort-bar">
+        <button class="sort-tab active">おすすめ順</button>
+        <button class="sort-tab">評価が高い順</button>
+        <button class="sort-tab">距離が近い順</button>
+        <button class="sort-tab">お気に入り数順</button>
+        <div class="view-toggles">
+          <button class="view-btn active" title="リスト表示"><i class="fa fa-list"></i></button>
+          <button class="view-btn" title="グリッド表示"><i class="fa fa-th-large"></i></button>
+        </div>
+      </div>
+
+      <!-- SPOT LIST -->
+      <section class="spot-list">
 
       <!-- ── カード 1 ── -->
-      <div class="spot-card" data-prefecture="gunma" data-spot-id="spot-001">
+      <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-001">
         <div class="card-thumb">
-          <img src="../images/home-image.png" alt="スポット写真">
+          <img src="../images/spots01.png" alt="旧岩崎邸庭園">
           <div class="card-thumb-grad"></div>
-          <button class="fav-btn active"><i class="fa fa-bookmark"></i></button>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
           <div class="card-tags">
-            <span class="tag tag-terrain">峠道</span>
-            <span class="tag tag-level">中級</span>
+            <span class="tag tag-terrain">歴史・洋館</span>
+            <span class="tag tag-level tag-beginner">初級</span>
           </div>
         </div>
         <div class="card-body">
           <div class="card-top">
             <div>
-              <div class="card-name">碓氷峠 めがね橋ルート</div>
-              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 群馬県 安中市</div>
+              <div class="card-name">旧岩崎邸庭園</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 台東区</div>
             </div>
             <div class="card-rating-wrap">
-              <div class="card-rating">4.8</div>
-              <div class="card-rating-label">最高</div>
-              <div class="card-review-count">1,234件</div>
+              <div class="card-rating">4.6</div>
+              <div class="card-rating-label">優秀</div>
+              <div class="card-review-count">1,842件</div>
             </div>
           </div>
           <div class="card-desc">
-            群馬を代表する絶景ルート。めがね橋から見下ろすロマンチック街道は絶景。
+            明治の実業家・岩崎弥太郎邸。ジョサイア・コンドル設計の洋館と日本庭園が共存する都内屈指の名所。
           </div>
           <div class="card-meta">
-            <div class="meta-item"><i class="fa fa-road"></i> 約 42 km</div>
-            <div class="meta-item"><i class="fa fa-clock"></i> 約 1.5 h</div>
-            <div class="meta-item"><i class="fa fa-heart"></i> 8,430</div>
+            <div class="meta-item"><i class="fa fa-road"></i> 約 8 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.5 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 4,210</div>
           </div>
           <div class="card-footer">
             <div class="card-access">
-              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-gas-pump access-icon ng"></i>
               <i class="fa fa-utensils access-icon ok"></i>
-              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-parking access-icon ng"></i>
               <i class="fa fa-restroom access-icon ok"></i>
             </div>
             <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
@@ -172,42 +176,42 @@
       </div>
 
       <!-- ── カード 2 ── -->
-      <div class="spot-card" data-prefecture="chiba" data-spot-id="spot-002">
+      <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-002">
         <div class="card-thumb">
-          <img src="../images/home-image.png" alt="スポット写真">
+          <img src="../images/spots02.png" alt="不忍池">
           <div class="card-thumb-grad"></div>
-          <button class="fav-btn active"><i class="fa fa-bookmark"></i></button>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
           <div class="card-tags">
-            <span class="tag tag-terrain">海岸線</span>
+            <span class="tag tag-terrain">池・自然</span>
             <span class="tag tag-level tag-beginner">初級</span>
           </div>
         </div>
         <div class="card-body">
           <div class="card-top">
             <div>
-              <div class="card-name">九十九里浜 サンセットライン</div>
-              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 千葉県 山武郡</div>
+              <div class="card-name">不忍池</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 台東区</div>
             </div>
             <div class="card-rating-wrap">
-              <div class="card-rating">4.6</div>
-              <div class="card-rating-label">優秀</div>
-              <div class="card-review-count">987件</div>
+              <div class="card-rating">4.4</div>
+              <div class="card-rating-label">良好</div>
+              <div class="card-review-count">3,105件</div>
             </div>
           </div>
           <div class="card-desc">
-            太平洋を横目に走り抜けるフラットな海沿いルート。初心者でも快適に走れる絶景コース。
+            上野恩賜公園に隣接する都会のオアシス。夏の蓮の花が一面に広がる景色はライダーの間でも人気。
           </div>
           <div class="card-meta">
-            <div class="meta-item"><i class="fa fa-road"></i> 約 60 km</div>
-            <div class="meta-item"><i class="fa fa-clock"></i> 約 2.0 h</div>
-            <div class="meta-item"><i class="fa fa-heart"></i> 6,201</div>
+            <div class="meta-item"><i class="fa fa-road"></i> 約 5 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.3 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 6,780</div>
           </div>
           <div class="card-footer">
             <div class="card-access">
-              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-gas-pump access-icon ng"></i>
               <i class="fa fa-utensils access-icon ok"></i>
               <i class="fa fa-parking access-icon ok"></i>
-              <i class="fa fa-restroom access-icon ng"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
             </div>
             <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
           </div>
@@ -217,38 +221,38 @@
       <!-- ── カード 3 ── -->
       <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-003">
         <div class="card-thumb">
-          <img src="../images/home-image.png" alt="スポット写真">
+          <img src="../images/spots03.png" alt="竹林公園">
           <div class="card-thumb-grad"></div>
-          <button class="fav-btn active"><i class="fa fa-bookmark"></i></button>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
           <div class="card-tags">
-            <span class="tag tag-terrain">街中・夜景</span>
+            <span class="tag tag-terrain">竹林・散策</span>
             <span class="tag tag-level tag-beginner">初級</span>
           </div>
         </div>
         <div class="card-body">
           <div class="card-top">
             <div>
-              <div class="card-name">お台場 レインボーブリッジ夜景ルート</div>
-              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 江東区</div>
+              <div class="card-name">竹林公園</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都</div>
             </div>
             <div class="card-rating-wrap">
-              <div class="card-rating">4.7</div>
-              <div class="card-rating-label">優秀</div>
-              <div class="card-review-count">3,241件</div>
+              <div class="card-rating">4.3</div>
+              <div class="card-rating-label">良好</div>
+              <div class="card-review-count">892件</div>
             </div>
           </div>
           <div class="card-desc">
-            夜のお台場を走り抜ける都会の絶景ルート。レインボーブリッジのライトアップが圧巻。
+            石畳と竹林が続く静寂のスポット。喧騒を離れたい時に立ち寄りたい隠れた穴場。
           </div>
           <div class="card-meta">
-            <div class="meta-item"><i class="fa fa-road"></i> 約 18 km</div>
-            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.8 h</div>
-            <div class="meta-item"><i class="fa fa-heart"></i> 11,430</div>
+            <div class="meta-item"><i class="fa fa-road"></i> 約 10 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.5 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 2,340</div>
           </div>
           <div class="card-footer">
             <div class="card-access">
-              <i class="fa fa-gas-pump access-icon ok"></i>
-              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-gas-pump access-icon ng"></i>
+              <i class="fa fa-utensils access-icon ng"></i>
               <i class="fa fa-parking access-icon ok"></i>
               <i class="fa fa-restroom access-icon ok"></i>
             </div>
@@ -258,41 +262,127 @@
       </div>
 
       <!-- ── カード 4 ── -->
-      <div class="spot-card" data-prefecture="tochigi" data-spot-id="spot-004">
+      <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-004">
         <div class="card-thumb">
-          <img src="../images/home-image.png" alt="スポット写真">
+          <img src="../images/spots04.png" alt="清澄庭園">
           <div class="card-thumb-grad"></div>
-          <button class="fav-btn active"><i class="fa fa-bookmark"></i></button>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
           <div class="card-tags">
-            <span class="tag tag-terrain">森林・湖</span>
-            <span class="tag tag-level">中級</span>
+            <span class="tag tag-terrain">日本庭園</span>
+            <span class="tag tag-level tag-beginner">初級</span>
           </div>
         </div>
         <div class="card-body">
           <div class="card-top">
             <div>
-              <div class="card-name">奥日光 中禅寺湖スカイライン</div>
-              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 栃木県 日光市</div>
+              <div class="card-name">清澄庭園</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 江東区</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.5</div>
+              <div class="card-rating-label">優秀</div>
+              <div class="card-review-count">2,214件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            回遊式林泉庭園の名園。大泉水を中心に全国の銘石が配された明治の名庭。都内随一の静けさ。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 12 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.5 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 5,120</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ng"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ng"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── カード 5 ── -->
+      <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-005">
+        <div class="card-thumb">
+          <img src="../images/spots05.png" alt="等々力渓谷">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">渓谷・自然</span>
+            <span class="tag tag-level tag-beginner">初級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">等々力渓谷</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 世田谷区</div>
             </div>
             <div class="card-rating-wrap">
               <div class="card-rating">4.7</div>
               <div class="card-rating-label">優秀</div>
-              <div class="card-review-count">1,562件</div>
+              <div class="card-review-count">4,630件</div>
             </div>
           </div>
           <div class="card-desc">
-            紅葉の名所・中禅寺湖を見下ろすワインディングロード。四季折々の表情が楽しめる。
+            都内唯一の渓谷。緑深い谷底を流れる矢沢川と赤い橋が織りなす景観は、ここが東京とは思えない別世界。
           </div>
           <div class="card-meta">
-            <div class="meta-item"><i class="fa fa-road"></i> 約 55 km</div>
-            <div class="meta-item"><i class="fa fa-clock"></i> 約 2.5 h</div>
-            <div class="meta-item"><i class="fa fa-heart"></i> 9,770</div>
+            <div class="meta-item"><i class="fa fa-road"></i> 約 20 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.8 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 9,450</div>
           </div>
           <div class="card-footer">
             <div class="card-access">
-              <i class="fa fa-gas-pump access-icon ok"></i>
+              <i class="fa fa-gas-pump access-icon ng"></i>
               <i class="fa fa-utensils access-icon ok"></i>
-              <i class="fa fa-parking access-icon ok"></i>
+              <i class="fa fa-parking access-icon ng"></i>
+              <i class="fa fa-restroom access-icon ok"></i>
+            </div>
+            <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── カード 6 ── -->
+      <div class="spot-card" data-prefecture="tokyo" data-spot-id="spot-006">
+        <div class="card-thumb">
+          <img src="../images/spots06.png" alt="小石川後楽園">
+          <div class="card-thumb-grad"></div>
+          <button class="fav-btn"><i class="fa fa-bookmark"></i></button>
+          <div class="card-tags">
+            <span class="tag tag-terrain">紅葉・庭園</span>
+            <span class="tag tag-level tag-beginner">初級</span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-top">
+            <div>
+              <div class="card-name">小石川後楽園</div>
+              <div class="card-location"><i class="fa fa-map-marker-alt"></i> 東京都 文京区</div>
+            </div>
+            <div class="card-rating-wrap">
+              <div class="card-rating">4.8</div>
+              <div class="card-rating-label">最高</div>
+              <div class="card-review-count">3,870件</div>
+            </div>
+          </div>
+          <div class="card-desc">
+            江戸初期に水戸徳川家が造営した大名庭園。秋の紅葉と池の水面に映る東京ドームの対比が圧巻。
+          </div>
+          <div class="card-meta">
+            <div class="meta-item"><i class="fa fa-road"></i> 約 15 km</div>
+            <div class="meta-item"><i class="fa fa-clock"></i> 約 0.6 h</div>
+            <div class="meta-item"><i class="fa fa-heart"></i> 8,920</div>
+          </div>
+          <div class="card-footer">
+            <div class="card-access">
+              <i class="fa fa-gas-pump access-icon ng"></i>
+              <i class="fa fa-utensils access-icon ok"></i>
+              <i class="fa fa-parking access-icon ng"></i>
               <i class="fa fa-restroom access-icon ok"></i>
             </div>
             <button class="card-detail-btn">詳しく見る <i class="fa fa-chevron-right"></i></button>
@@ -307,6 +397,8 @@
         <button class="page-btn disabled"><i class="fa fa-chevron-right"></i></button>
       </div>
     </section>
+
+    </div><!-- /.spots-float-panel -->
 
     <!-- ===== RIGHT: MAP ===== -->
     <div class="map-panel">
@@ -411,6 +503,16 @@
 
   function closeOnEsc(e) {
     if (e.key === 'Escape') toggleMapExpand();
+  }
+
+  /* ── Spots Panel Toggle ── */
+  function toggleSpotsPanel() {
+    const panel = document.getElementById('spotsFloatPanel');
+    const btn   = document.getElementById('panelToggleBtn');
+    const collapsed = panel.classList.toggle('collapsed');
+    btn.classList.toggle('collapsed', collapsed);
+    btn.title = collapsed ? 'パネルを開く' : 'パネルを閉じる';
+    if (leafletMap) setTimeout(() => leafletMap.invalidateSize(), 360);
   }
 
   /* ── Drawer ── */
@@ -650,10 +752,12 @@
 
   /* ── Leaflet Map ── */
   const SPOTS = [
-    { name: '碓氷峠 めがね橋ルート',         lat: 36.3395, lng: 138.6640, rating: 4.8, highlight: false, pref: 'gunma',    level: '上級', myPost: false },
-    { name: '九十九里浜 サンセットライン',     lat: 35.5600, lng: 140.4300, rating: 4.6, highlight: false, pref: 'chiba',    level: '初級', myPost: false },
-    { name: 'お台場 レインボーブリッジ夜景',   lat: 35.6268, lng: 139.7739, rating: 4.7, highlight: true,  pref: 'tokyo',    level: '初級', myPost: true  },
-    { name: '奥日光 中禅寺湖スカイライン',     lat: 36.7330, lng: 139.4890, rating: 4.7, highlight: false, pref: 'tochigi',  level: '中級', myPost: false },
+    { name: '旧岩崎邸庭園',   lat: 35.7089, lng: 139.7712, rating: 4.6, highlight: false, pref: 'tokyo', level: '初級', myPost: false },
+    { name: '不忍池',         lat: 35.7127, lng: 139.7711, rating: 4.4, highlight: false, pref: 'tokyo', level: '初級', myPost: false },
+    { name: '竹林公園',       lat: 35.7528, lng: 139.6498, rating: 4.3, highlight: false, pref: 'tokyo', level: '初級', myPost: false },
+    { name: '清澄庭園',       lat: 35.6802, lng: 139.7975, rating: 4.5, highlight: false, pref: 'tokyo', level: '初級', myPost: false },
+    { name: '等々力渓谷',     lat: 35.6094, lng: 139.6467, rating: 4.7, highlight: true,  pref: 'tokyo', level: '初級', myPost: false },
+    { name: '小石川後楽園',   lat: 35.7056, lng: 139.7483, rating: 4.8, highlight: false, pref: 'tokyo', level: '初級', myPost: false },
   ];
 
   function makeIcon(highlight, level, myPost) {
@@ -663,7 +767,7 @@
       strokeColor = 'rgba(255,255,255,0.85)';
       dotColor    = '#fff';
     } else if (level === '初級') {
-      fillColor   = highlight ? 'rgba(52,211,153,0.85)' : 'rgba(52,211,153,0.55)';
+      fillColor   = highlight ? 'rgba(59,130,246,0.9)' : 'rgba(59,130,246,0.65)';
       strokeColor = highlight ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.5)';
       dotColor    = highlight ? '#fff' : 'rgba(255,255,255,0.85)';
     } else if (level === '上級') {
@@ -697,8 +801,8 @@
     );
 
     leafletMap = L.map('leaflet-map', {
-      center:              [36.0, 139.6],
-      zoom:                9,
+      center:              [35.68, 139.75],
+      zoom:                11,
       minZoom:             8,
       maxZoom:             14,
       maxBounds:           KANTO_BOUNDS,
