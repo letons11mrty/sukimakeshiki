@@ -98,9 +98,9 @@
 }
 
 .form-input:focus {
-  border-color: rgba(200, 164, 90, 0.6);
+  border-color: rgba(255, 255, 255, 0.35);
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(200, 164, 90, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.06);
 }
 
 /* パスワード入力ラッパー（目アイコン用） */
@@ -135,7 +135,7 @@
   display: block;
   text-align: right;
   font-size: 12px;
-  color: #c8a45a;
+  color: rgba(255, 255, 255, 0.5);
   text-decoration: none;
   margin-top: 8px;
   margin-bottom: 24px;
@@ -143,7 +143,7 @@
 }
 
 .forgot-link:hover {
-  color: #e0b96a;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* ログインボタン（btn-auth流用 + 上書き） */
@@ -160,17 +160,17 @@
   font-weight: 600;
   cursor: pointer;
   letter-spacing: 0.06em;
-  background: rgba(200, 164, 90, 0.85);
-  color: #0a0e16;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.88);
   transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
   position: relative;
   overflow: hidden;
 }
 
 .btn-signin:hover {
-  background: rgba(224, 185, 106, 0.9);
+  background: rgba(255, 255, 255, 0.16);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(200, 164, 90, 0.3);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.06);
 }
 
 .btn-signin:active {
@@ -208,7 +208,7 @@
 }
 
 .signup-link a {
-  color: #c8a45a;
+  color: rgba(255, 255, 255, 0.65);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.2s;
@@ -216,7 +216,7 @@
 }
 
 .signup-link a:hover {
-  color: #e0b96a;
+  color: #fff;
 }
 
 /* ==============================

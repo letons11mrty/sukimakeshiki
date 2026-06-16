@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お気に入り | すきまけしき</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/fav.css">
+</head>
+<body>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="drawer-logo">
+    <img src="../images/icon.png" alt="">
+    <div class="logo-name">sukima</div>
+    <div class="logo-sub">すきまけしき</div>
+  </div>
+  <div class="drawer-menu">
+    <a href="home.html"><i class="fa fa-home"></i> home</a>
+    <a href="main.html"><i class="fa fa-search"></i> spots</a>
+    <a href="post.html"><i class="fa fa-plus"></i> post</a>
+    <a href="fav.html" class="active"><i class="fa fa-bookmark"></i> favorite</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> unlock</a>
+    <div class="drawer-spacer"></div>
+    <a href="#"><i class="fa fa-cog"></i> settings</a>
+  </div>
+</nav>
+
+<!-- ===== FAV PAGE ===== -->
+<div id="fav-page">
+
+  <!-- HEADER -->
+  <header class="fav-header">
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
+    <div class="header-divider"></div>
+    <span class="fav-header-title page-label">favorite</span>
+    <span class="fav-count-badge" id="favCountBadge">0 件</span>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="fav-content" id="favContent">
+    <!-- JS で描画 -->
+  </div>
+
+</div>
+
+<!-- ===== SPOT DETAIL MODAL ===== -->
+<div class="spot-modal-overlay" id="spotModalOverlay" onclick="closeSpotModal()"></div>
+<div class="spot-modal" id="spotModal">
+  <button class="spot-modal-close" onclick="closeSpotModal()"><i class="fa fa-times"></i></button>
+  <div class="spot-modal-thumb">
+    <img id="modalImg" src="" alt="">
+    <div class="spot-modal-thumb-grad"></div>
+    <div class="spot-modal-tags" id="modalTags"></div>
+  </div>
+  <div class="spot-modal-body">
+    <div class="spot-modal-top">
+      <div>
+        <div class="spot-modal-name" id="modalName"></div>
+        <div class="spot-modal-loc" id="modalLoc"></div>
+      </div>
+      <div class="spot-modal-rating-wrap">
+        <div class="spot-modal-rating" id="modalRating"></div>
+        <div class="spot-modal-rating-label" id="modalRatingLabel"></div>
+        <div class="spot-modal-review" id="modalReview"></div>
+      </div>
+    </div>
+    <div class="spot-modal-desc" id="modalDesc"></div>
+    <div class="spot-modal-meta" id="modalMeta"></div>
+    <div class="spot-modal-footer">
+      <div class="spot-modal-access" id="modalAccess"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* main.cssのモーダルスタイルをインラインで再利用 */
+  .spot-modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    z-index: 300; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .spot-modal-overlay.open { opacity: 1; pointer-events: all; }
+  .spot-modal {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -46%) scale(0.96);
+    width: min(560px, calc(100vw - 32px));
+    max-height: calc(100dvh - 48px);
+    overflow-y: auto;
+    background: rgba(18,18,18,0.96);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px;
+    z-index: 301; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+  }
+  .spot-modal.open { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
+  .spot-modal-close {
+    position: absolute; top: 14px; right: 14px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7); font-size: 13px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; z-index: 2;
+    transition: background 0.2s, color 0.2s;
+  }
+  .spot-modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .spot-modal-thumb { position: relative; height: 220px; border-radius: 18px 18px 0 0; overflow: hidden; }
+  .spot-modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .spot-modal-thumb-grad { position: absolute; inset: 0; background: linear-gradient(to top, rgba(18,18,18,0.85) 0%, transparent 55%); }
+  .spot-modal-tags { position: absolute; bottom: 14px; left: 14px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .spot-modal-body { padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 14px; }
+  .spot-modal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .spot-modal-name { font-size: 18px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 5px; }
+  .spot-modal-loc { font-size: 12px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 4px; }
+  .spot-modal-rating-wrap { text-align: center; flex-shrink: 0; }
+  .spot-modal-rating {
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+    font-size: 20px; font-weight: 700; width: 48px; height: 48px;
+    border-radius: 10px 10px 0 10px; display: flex; align-items: center; justify-content: center;
+  }
+  .spot-modal-rating-label { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+  .spot-modal-review { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+  .spot-modal-desc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.75; border-top: 1px solid rgba(255,255,255,0.07); padding-top: 14px; }
+  .spot-modal-meta { display: flex; gap: 18px; flex-wrap: wrap; }
+  .spot-modal-meta .meta-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.45); }
+  .spot-modal-meta .meta-item i { color: rgba(255,255,255,0.35); font-size: 11px; }
+  .spot-modal-footer { display: flex; align-items: center; justify-content: flex-end; padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .access-icon { font-size: 15px; }
+  .access-icon.ok { color: rgba(255,255,255,0.45); }
+  .access-icon.ng { color: rgba(255,255,255,0.12); }
+</style>
+
+<script>
+  const FAV_KEY = 'sk_favorites';
+
+  function getFavs() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; }
+    catch { return []; }
+  }
+
+  function removeFav(spotId) {
+    const favs = getFavs().filter(f => f.id !== spotId);
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  }
+
+  function formatDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} 保存`;
+  }
+
+  function buildTagsHTML(tags) {
+    if (!tags || !tags.length) return '';
+    return tags.map(t => `<span class="${t.cls}">${t.text}</span>`).join('');
+  }
+
+  function buildMetaHTML(metas) {
+    if (!metas || !metas.length) return '';
+    const icons = ['fa-road', 'fa-clock', 'fa-heart'];
+    return metas.map((m, i) => `
+      <div class="meta-item"><i class="fa ${icons[i] || 'fa-info'}"></i> ${m}</div>
+    `).join('');
+  }
+
+  function buildAccessHTML(access) {
+    if (!access || !access.length) return '';
+    return access.map(a => `<i class="${a.cls}"></i>`).join('');
+  }
+
+  let _modalFav = null;
+
+  function openModal(fav) {
+    _modalFav = fav;
+    document.getElementById('modalImg').src = fav.img || '';
+    document.getElementById('modalName').textContent = fav.name || '';
+    document.getElementById('modalLoc').innerHTML = `<i class="fa fa-map-marker-alt"></i> ${fav.location || ''}`;
+    document.getElementById('modalRating').textContent = fav.rating || '';
+    document.getElementById('modalRatingLabel').textContent = fav.ratingLabel || '';
+    document.getElementById('modalReview').textContent = fav.reviewCount || '';
+    document.getElementById('modalDesc').textContent = fav.desc || '';
+    document.getElementById('modalTags').innerHTML = buildTagsHTML(fav.tags);
+    document.getElementById('modalMeta').innerHTML = buildMetaHTML(fav.metas);
+    document.getElementById('modalAccess').innerHTML = buildAccessHTML(fav.access);
+    document.getElementById('spotModalOverlay').classList.add('open');
+    document.getElementById('spotModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeSpotModal() {
+    document.getElementById('spotModalOverlay').classList.remove('open');
+    document.getElementById('spotModal').classList.remove('open');
+    document.body.style.overflow = '';
+    _modalFav = null;
+  }
+
+  function renderFavs() {
+    const favs = getFavs();
+    const content = document.getElementById('favContent');
+    const badge = document.getElementById('favCountBadge');
+    badge.textContent = `${favs.length} 件`;
+
+    if (favs.length === 0) {
+      content.innerHTML = `
+        <div class="fav-empty">
+          <i class="fa fa-bookmark fav-empty-icon"></i>
+          <div class="fav-empty-title">お気に入りがまだありません</div>
+          <div class="fav-empty-sub">スポット一覧のブックマークアイコンをタップして<br>お気に入りに追加しましょう</div>
+          <a class="fav-empty-btn" href="main.html">スポットを探す</a>
+        </div>`;
+      return;
+    }
+
+    content.innerHTML = '';
+    favs.forEach((fav, idx) => {
+      const card = document.createElement('div');
+      card.className = 'fav-card';
+      card.style.animationDelay = `${idx * 60}ms`;
+      card.innerHTML = `
+        <div class="fav-card-thumb">
+          ${fav.img ? `<img src="${fav.img}" alt="${fav.name}">` : '<div style="width:100%;height:100%;background:#1c1c1c;display:flex;align-items:center;justify-content:center;"><i class="fa fa-image" style="font-size:28px;color:rgba(255,255,255,0.1);"></i></div>'}
+          <div class="fav-card-thumb-grad"></div>
+          <div class="fav-card-tags">${buildTagsHTML(fav.tags)}</div>
+        </div>
+        <div class="fav-card-body">
+          <div class="fav-card-top">
+            <div>
+              <div class="fav-card-name">${fav.name}</div>
+              <div class="fav-card-loc"><i class="fa fa-map-marker-alt"></i> ${fav.location}</div>
+            </div>
+            <div class="fav-card-rating">${fav.rating}</div>
+          </div>
+          ${fav.desc ? `<div class="fav-card-desc">${fav.desc}</div>` : ''}
+          <div class="fav-card-footer">
+            <span class="fav-card-saved">${formatDate(fav.savedAt)}</span>
+            <div class="fav-card-actions">
+              <button class="fav-card-detail-btn" data-idx="${idx}">詳しく見る <i class="fa fa-chevron-right"></i></button>
+              <button class="fav-card-remove-btn" data-id="${fav.id}" title="削除"><i class="fa fa-trash"></i></button>
+            </div>
+          </div>
+        </div>`;
+      content.appendChild(card);
+    });
+
+    content.querySelectorAll('.fav-card-detail-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const fav = getFavs()[parseInt(btn.dataset.idx)];
+        if (fav) openModal(fav);
+      });
+    });
+
+    content.querySelectorAll('.fav-card-remove-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        removeFav(btn.dataset.id);
+        renderFavs();
+      });
+    });
+  }
+
+  /* ── Drawer ── */
+  function openDrawer() {
+    document.getElementById('drawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('drawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSpotModal(); });
+
+  document.addEventListener('DOMContentLoaded', renderFavs);
+</script>
+</body>
+</html>

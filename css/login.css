@@ -229,7 +229,7 @@
 
 .btn-link {
   text-align: center;
-  color: #c8a45a;
+  color: rgba(255, 255, 255, 0.55);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;

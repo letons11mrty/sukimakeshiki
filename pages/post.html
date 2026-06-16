@@ -15,16 +15,18 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <nav class="drawer" id="drawer">
   <div class="drawer-logo">
-    <img src="../images/iron.png" alt="ロゴ">
-    <span>バイクコミュニティ</span>
+    <img src="../images/icon.png" alt="">
+    <div class="logo-name">sukima</div>
+    <div class="logo-sub">すきまけしき</div>
   </div>
   <div class="drawer-menu">
-    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
-    <a href="main.html"><i class="fa fa-map"></i> マップ</a>
-    <a href="post.html" class="active"><i class="fa fa-plus-circle"></i> 投稿する</a>
-    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
-    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
-    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+    <a href="home.html"><i class="fa fa-home"></i> home</a>
+    <a href="main.html"><i class="fa fa-search"></i> spots</a>
+    <a href="post.html" class="active"><i class="fa fa-plus"></i> post</a>
+    <a href="fav.html"><i class="fa fa-bookmark"></i> favorite</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> unlock</a>
+    <div class="drawer-spacer"></div>
+    <a href="#"><i class="fa fa-cog"></i> settings</a>
   </div>
 </nav>
 
@@ -33,11 +35,11 @@
 
   <!-- HEADER -->
   <header class="post-header">
-    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
     <div class="header-divider" style="width:1px;height:20px;background:rgba(255,255,255,0.15);"></div>
-    <span class="post-header-title">景色を投稿する</span>
+    <span class="post-header-title page-label">post</span>
     <button class="btn-post-submit" onclick="submitPost()">
-      <i class="fa fa-paper-plane" style="margin-right:6px;"></i>投稿する
+      <i class="fa fa-paper-plane" style="margin-right:6px;"></i>submit
     </button>
   </header>
 
@@ -197,6 +199,28 @@
                     maxlength="200"
                     oninput="countChars(this, 'accessCount', 200)"></textarea>
           <div class="char-count" id="accessCount">0 / 200</div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">設備（任意）</label>
+          <div class="facility-toggle-row">
+            <button type="button" class="facility-btn" data-fac="gas" onclick="toggleFacility(this)" title="ガソリンスタンド">
+              <i class="fa fa-gas-pump"></i>
+              <span>給油</span>
+            </button>
+            <button type="button" class="facility-btn" data-fac="food" onclick="toggleFacility(this)" title="飲食店">
+              <i class="fa fa-utensils"></i>
+              <span>飲食</span>
+            </button>
+            <button type="button" class="facility-btn" data-fac="parking" onclick="toggleFacility(this)" title="駐車場">
+              <i class="fa fa-parking"></i>
+              <span>駐車場</span>
+            </button>
+            <button type="button" class="facility-btn" data-fac="restroom" onclick="toggleFacility(this)" title="トイレ">
+              <i class="fa fa-restroom"></i>
+              <span>トイレ</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -966,6 +990,16 @@
     setTimeout(() => { el.style.borderColor = ''; el.style.boxShadow = ''; }, 1800);
   }
 
+  /* ── 設備トグル ── */
+  function toggleFacility(btn) {
+    btn.classList.toggle('active');
+  }
+
+  function getSelectedFacilities() {
+    return [...document.querySelectorAll('.facility-btn.active')]
+      .map(btn => btn.dataset.fac);
+  }
+
   /* ============================
      投稿
      ============================ */
@@ -997,6 +1031,7 @@
       time:       document.getElementById('timeSelect').value,
       desc:       document.getElementById('spotDesc').value.trim(),
       access:     document.getElementById('spotAccess').value.trim(),
+      facilities: getSelectedFacilities(),
       tags:       [...tags],
       difficulty: parseInt(document.getElementById('diffSlider').value),
       score:      starVal,

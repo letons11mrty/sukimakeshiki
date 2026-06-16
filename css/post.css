@@ -4,7 +4,7 @@
 
 #post-page {
   min-height: 100vh;
-  background: #181818;
+  background: #1a1a1a;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -23,28 +23,24 @@
   z-index: 100;
 }
 
-.hamburger {
-  font-size: 20px;
-  color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px;
-  border-radius: 5px;
-  transition: background 0.2s;
-}
-.hamburger:hover { background: rgba(255, 255, 255, 0.08); }
 
 .post-header-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.06em;
+  font-size: 12px;
+  font-weight: 200;
+  color: rgba(255,255,255,0.32);
+  letter-spacing: 0.22em;
   flex: 1;
+  font-family: 'Raleway', sans-serif;
+  text-transform: lowercase;
 }
 
 .btn-post-submit {
-  background: linear-gradient(135deg, #c8a45a, #e0b96a);
-  color: #0a0e16;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.85);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
   border: none;
   border-radius: 50px;
   padding: 9px 22px;
@@ -98,7 +94,7 @@
   align-items: center;
   gap: 8px;
 }
-.post-card-title i { color: #c8a45a; font-size: 12px; }
+.post-card-title i { color: rgba(255,255,255,0.4); font-size: 12px; }
 
 /* ── 写真アップロード ── */
 .photo-upload-area {
@@ -116,12 +112,12 @@
   overflow: hidden;
 }
 .photo-upload-area:hover {
-  border-color: rgba(200, 164, 90, 0.45);
-  background: rgba(200, 164, 90, 0.03);
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.02);
 }
 .photo-upload-area.drag-over {
-  border-color: #c8a45a;
-  background: rgba(200, 164, 90, 0.06);
+  border-color: rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.04);
 }
 
 .upload-icon {
@@ -136,8 +132,8 @@
   color: rgba(255, 255, 255, 0.3);
 }
 .photo-upload-area.drag-over .upload-icon {
-  background: rgba(200, 164, 90, 0.15);
-  color: #c8a45a;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.7);
 }
 
 .upload-text {
@@ -148,7 +144,7 @@
 }
 
 .upload-text span {
-  color: #c8a45a;
+  color: rgba(255,255,255,0.75);
   font-weight: 600;
 }
 
@@ -211,8 +207,8 @@
   transition: border-color 0.2s, color 0.2s;
 }
 .photo-add-btn:hover {
-  border-color: rgba(200, 164, 90, 0.4);
-  color: #c8a45a;
+  border-color: rgba(255,255,255,0.28);
+  color: rgba(255,255,255,0.55);
 }
 
 /* ── フォーム入力 ── */
@@ -258,8 +254,8 @@
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-  border-color: rgba(200, 164, 90, 0.5);
-  background: rgba(200, 164, 90, 0.04);
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.03);
 }
 
 .form-textarea {
@@ -285,7 +281,7 @@
   text-align: right;
   margin-top: -4px;
 }
-.char-count.warn { color: #e0b96a; }
+.char-count.warn { color: rgba(255,255,255,0.5); }
 
 /* ── タグ入力 ── */
 .tag-wrap {
@@ -300,18 +296,18 @@
   cursor: text;
   transition: border-color 0.2s;
 }
-.tag-wrap:focus-within { border-color: rgba(200, 164, 90, 0.5); }
+.tag-wrap:focus-within { border-color: rgba(255,255,255,0.25); }
 
 .tag-chip {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(200, 164, 90, 0.12);
-  border: 1px solid rgba(200, 164, 90, 0.25);
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.15);
   border-radius: 50px;
   padding: 3px 10px;
   font-size: 12px;
-  color: #c8a45a;
+  color: rgba(255,255,255,0.7);
   animation: chipIn 0.2s ease;
 }
 
@@ -323,14 +319,14 @@
 .tag-chip button {
   background: none;
   border: none;
-  color: rgba(200, 164, 90, 0.6);
+  color: rgba(255,255,255,0.3);
   cursor: pointer;
   font-size: 11px;
   line-height: 1;
   padding: 0;
   display: flex;
 }
-.tag-chip button:hover { color: #c8a45a; }
+.tag-chip button:hover { color: rgba(255,255,255,0.75); }
 
 .tag-input {
   flex: 1;
@@ -348,6 +344,49 @@
   font-size: 11px;
   color: rgba(255, 255, 255, 0.2);
   margin-top: 6px;
+}
+
+/* ── 設備トグル ── */
+.facility-toggle-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.facility-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 4px;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  min-width: 64px;
+  backdrop-filter: blur(8px);
+}
+
+.facility-btn i {
+  font-size: 18px;
+}
+
+.facility-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.65);
+  border-color: rgba(255,255,255,0.22);
+}
+
+.facility-btn.active {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.35);
+  color: rgba(255,255,255,0.9);
 }
 
 /* ── 難易度スライダー ── */
@@ -372,16 +411,16 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #c8a45a, #e0b96a);
+  background: rgba(255,255,255,0.85);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(200, 164, 90, 0.5);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
 
 .difficulty-label {
   min-width: 60px;
   font-size: 13px;
   font-weight: 700;
-  color: #c8a45a;
+  color: rgba(255,255,255,0.85);
   text-align: right;
 }
 
@@ -390,6 +429,9 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: sticky;
+  top: 80px;
+  align-self: flex-start;
 }
 
 /* ── プレビューカード ── */
@@ -420,9 +462,9 @@
   font-size: 10px;
   padding: 3px 9px;
   border-radius: 50px;
-  background: rgba(200, 164, 90, 0.12);
-  color: #c8a45a;
-  border: 1px solid rgba(200, 164, 90, 0.2);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.45);
+  border: 1px solid rgba(255,255,255,0.12);
   letter-spacing: 0.04em;
 }
 
@@ -515,15 +557,15 @@
 
 /* ── アドバイスカード ── */
 .tips-card {
-  background: rgba(200, 164, 90, 0.06);
-  border: 1px solid rgba(200, 164, 90, 0.18);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
   padding: 18px 20px;
 }
 .tips-head {
   font-size: 12px;
   font-weight: 700;
-  color: #c8a45a;
+  color: rgba(255,255,255,0.55);
   letter-spacing: 0.06em;
   margin-bottom: 12px;
   display: flex;
@@ -544,7 +586,7 @@
 }
 .tips-item::before {
   content: '•';
-  color: rgba(200, 164, 90, 0.5);
+  color: rgba(255,255,255,0.2);
   flex-shrink: 0;
 }
 
@@ -601,57 +643,6 @@
   }
 }
 
-/* ── ドロワー（shared） ── */
-.drawer-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 200;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-.drawer-overlay.open { opacity: 1; pointer-events: all; }
-
-.drawer {
-  position: fixed;
-  top: 0; left: 0;
-  width: 240px;
-  height: 100%;
-  background: #161616;
-  border-right: 1px solid #2a2a2a;
-  z-index: 201;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 24px 0;
-}
-.drawer.open { transform: translateX(0); }
-
-.drawer-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 20px 20px;
-  border-bottom: 1px solid #2a2a2a;
-  margin-bottom: 14px;
-}
-.drawer-logo img { width: 34px; height: 34px; object-fit: contain; opacity: 0.65; }
-.drawer-logo span { font-size: 13px; color: rgba(255, 255, 255, 0.55); }
-
-.drawer-menu a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 20px;
-  color: rgba(255, 255, 255, 0.6);
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s, color 0.15s;
-}
-.drawer-menu a:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.drawer-menu a.active { background: rgba(200, 164, 90, 0.1); color: #c8a45a; }
-.drawer-menu a.active i { opacity: 1; }
-.drawer-menu i { width: 18px; text-align: center; opacity: 0.5; }
 
 /* ── 完了モーダル ── */
 .post-done-overlay {
@@ -688,14 +679,14 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(200, 164, 90, 0.2), rgba(224, 185, 106, 0.1));
-  border: 2px solid rgba(200, 164, 90, 0.4);
+  background: rgba(255,255,255,0.06);
+  border: 2px solid rgba(255,255,255,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
   font-size: 28px;
-  color: #c8a45a;
+  color: rgba(255,255,255,0.75);
 }
 .done-title {
   font-size: 20px;

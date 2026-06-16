@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ホーム | バイクコミュニティ</title>
+  <title>ホーム | すきまけしき</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="../css/base.css">
   <link rel="stylesheet" href="../css/home.css">
@@ -14,25 +14,27 @@
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 <nav class="drawer" id="drawer">
   <div class="drawer-logo">
-    <img src="../images/iron.png" alt="ロゴ">
-    <span>バイクコミュニティ</span>
+    <img src="../images/icon.png" alt="">
+    <div class="logo-name">sukima</div>
+    <div class="logo-sub">すきまけしき</div>
   </div>
   <div class="drawer-menu">
-    <a href="home.html"><i class="fa fa-home"></i> ホーム</a>
-    <a href="main.html"><i class="fa fa-map"></i> マップ</a>
-    <a href="post.html"><i class="fa fa-plus-circle"></i> 投稿する</a>
-    <a href="#"><i class="fa fa-bookmark"></i> お気に入り</a>
-    <a href="map.html"><i class="fa fa-unlock-alt"></i> エリア解除</a>
-    <a href="#"><i class="fa fa-cog"></i> 設定</a>
+    <a href="home.html" class="active"><i class="fa fa-home"></i> home</a>
+    <a href="main.html"><i class="fa fa-search"></i> spots</a>
+    <a href="post.html"><i class="fa fa-plus"></i> post</a>
+    <a href="fav.html"><i class="fa fa-bookmark"></i> favorite</a>
+    <a href="map.html"><i class="fa fa-unlock-alt"></i> unlock</a>
+    <div class="drawer-spacer"></div>
+    <a href="#"><i class="fa fa-cog"></i> settings</a>
   </div>
 </nav>
 
 <!-- ===== HOME PAGE ===== -->
 <div id="home-page" class="page active">
   <header class="home-header">
-    <span class="hamburger" onclick="openDrawer()">&#9776;</span>
+    <button class="hamburger" onclick="openDrawer()"><span></span><span></span><span></span></button>
     <div class="header-divider"></div>
-    <span class="region-badge">japan</span>
+    <span class="region-badge">home</span>
   </header>
 
   <div class="welcome-banner">
