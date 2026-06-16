@@ -73,8 +73,8 @@ body {
   flex-shrink: 0;
 }
 .drawer-logo img {
-  width: 24px;
-  height: 24px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   opacity: 0.4;
   margin-bottom: 16px;
@@ -151,9 +151,9 @@ body {
 }
 
 .drawer-menu i {
-  width: 14px;
+  width: 18px;
   text-align: center;
-  font-size: 11px;
+  font-size: 15px;
   flex-shrink: 0;
   opacity: 0.7;
 }
