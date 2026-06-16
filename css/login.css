@@ -81,6 +81,12 @@
   filter: brightness(1.4);
 }
 
+.login-icon {
+  width: 30px !important;
+  height: 30px !important;
+  opacity: 0.6 !important;
+}
+
 /* search */
 .search-area {
   display: flex;
